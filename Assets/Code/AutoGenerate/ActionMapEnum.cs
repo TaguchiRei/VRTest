@@ -3,6 +3,7 @@ public enum ActionMaps
 {
     Player = 0,
     UI = 1,
+    VR = 2,
 }
 
 public enum PlayerActions
@@ -30,5 +31,15 @@ public enum UIActions
     ScrollWheel = 7,
     TrackedDevicePosition = 8,
     TrackedDeviceOrientation = 9,
+}
+
+public enum VRActions
+{
+    HeadPosition = 0,
+    HeadRotation = 1,
+    LeftHandPosition = 2,
+    LeftHandRotation = 3,
+    RightHandPosition = 4,
+    RightHandRotation = 5,
 }
 
