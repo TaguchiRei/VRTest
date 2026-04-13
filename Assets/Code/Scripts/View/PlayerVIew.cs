@@ -1,13 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerVIew : MonoBehaviour
+public class PlayerView : InitializableMonoBehaviour
 {
     [SerializeField] private Rigidbody _rigidbody;
-
-    private bool _isInitialized = false;
-
-    public void Initialize()
-    {
-    }
 }

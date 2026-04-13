@@ -1,11 +1,12 @@
 using System;
+using ScriptedTalk;
 using UnityEngine;
 
 [DefaultExecutionOrder(100)]
 public abstract class InitializableMonoBehaviour : MonoBehaviour, IComparable<InitializableMonoBehaviour>
 {
     public int InitializationOrder = 0;
-    public bool Initialized { get; private set; } = false;
+    [ShowOnly] public bool Initialized { get; private set; } = false;
 
     private protected void Awake()
     {
@@ -19,7 +20,7 @@ public abstract class InitializableMonoBehaviour : MonoBehaviour, IComparable<In
         Initialized = true;
         enabled = true;
     }
-    
+
     public int CompareTo(InitializableMonoBehaviour other)
     {
         return InitializationOrder.CompareTo(other.InitializationOrder);
