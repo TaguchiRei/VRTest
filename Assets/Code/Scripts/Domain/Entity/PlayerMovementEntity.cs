@@ -1,3 +1,4 @@
+using Code.Scripts.Domain.Player;
 using UnityEngine;
 
 namespace Domain

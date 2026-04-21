@@ -1,21 +1,25 @@
+using Application;
 using UnityEngine;
 
-public class PlayerView : InitializableMonoBehaviour
+
+public class PlayerView : InitializableMonoBehaviour, IMovementView
 {
     [SerializeField] private Rigidbody _rigidbody;
 
-    private Vector3 _moveVector;
-    private Vector3 _gravityVector;
-    private DivisionVector _divisionVector;
+    public Vector3 Velocity
+    {
+        get => _rigidbody.linearVelocity;
+        set => _rigidbody.linearVelocity = value;
+    }
 
     public override void Initialize()
     {
         base.Initialize();
-        _divisionVector = new DivisionVector(_rigidbody);
+        _rigidbody.useGravity = false;
     }
 
-    public void MovePlayer(Vector2 moveVector)
+    public void AddForce(Vector3 force, ForceMode mode)
     {
-        _divisionVector.MoveVectorChange(moveVector);
+        _rigidbody.AddForce(force, mode);
     }
 }

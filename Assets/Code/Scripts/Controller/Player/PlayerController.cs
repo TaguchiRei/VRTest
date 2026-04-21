@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlaerController : InitializableMonoBehaviour
+public class PlayerController : InitializableMonoBehaviour
 {
     public override void Initialize()
     {
