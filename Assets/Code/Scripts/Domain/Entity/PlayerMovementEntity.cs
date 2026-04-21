@@ -11,9 +11,12 @@ namespace Domain
         public GravityValue Gravity { get; private set; }
         public MovePowerValue LastMovePower { get; private set; }
 
-        public PlayerMovementEntity(GravityValue gravity)
+        public MoveSpeed MoveSpeed { get; private set; }
+
+        public PlayerMovementEntity(GravityValue gravity, MoveSpeed moveSpeed)
         {
             Gravity = gravity;
+            MoveSpeed = moveSpeed;
             LastMovePower = MovePowerValue.Zero;
         }
 

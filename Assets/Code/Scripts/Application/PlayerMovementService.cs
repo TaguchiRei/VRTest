@@ -24,19 +24,20 @@ namespace Application
         {
             // 現在の速度
             Vector3 currentVelocity = _view.Velocity;
-            
+
             // 前回の移動成分を取り除いた速度を計算
             Vector3 velocityWithoutLastMove = MovementLogic.CalculateVelocityAfterStop(
-                currentVelocity, 
+                currentVelocity,
                 _entity.LastMovePower.Value
             );
-            
+
             // 新しい移動ベクトルを計算
             Vector3 newMoveVector = MovementLogic.CalculateMoveVector(input, _entity.Gravity.Direction);
-            
+            newMoveVector *= _entity.MoveSpeed.Value;
+
             // エンティティの状態を更新
             _entity.UpdateMovePower(newMoveVector);
-            
+
             // Viewに反映
             _view.Velocity = velocityWithoutLastMove + newMoveVector;
         }

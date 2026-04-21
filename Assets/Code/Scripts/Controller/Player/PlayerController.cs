@@ -9,6 +9,8 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
     private IInputDispatcher _inputDispatcher;
     private PlayerMovementService _playerMovementService;
 
+    private Vector2 _moveInputValue;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -21,6 +23,12 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
         }
 
         Registration();
+        DebugGUI.ObserveVariable("MoveInput", ObserveMoveInput);
+    }
+
+    private string ObserveMoveInput()
+    {
+        return _moveInputValue.ToString();
     }
 
     private void OnDestroy()
@@ -30,14 +38,20 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        var value = context.ReadValue<Vector2>();
-        Debug.Log(value);
+        _moveInputValue = context.ReadValue<Vector2>();
+    }
+
+    private void FixedUpdate()
+    {
+        if (Initialized)
+        {
+            _playerMovementService.ApplyGravity();
+            _playerMovementService.Move(_moveInputValue);
+        }
     }
 
     public void OnLook(InputAction.CallbackContext context)
     {
-        var value = context.ReadValue<Vector2>();
-        Debug.Log(value);
     }
 
     public void OnGripLeft(InputAction.CallbackContext context)
