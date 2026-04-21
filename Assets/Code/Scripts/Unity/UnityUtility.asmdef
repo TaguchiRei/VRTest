@@ -1,9 +1,8 @@
 {
-    "name": "View",
+    "name": "UnityUtility",
     "rootNamespace": "",
     "references": [
-        "GUID:a2e759e845602164c860fc6e0391090c",
-        "GUID:b30078241a74c094b941e279750a3696"
+        "GUID:a2e759e845602164c860fc6e0391090c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

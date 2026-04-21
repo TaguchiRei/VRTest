@@ -16,6 +16,6 @@ public class PlayerView : InitializableMonoBehaviour
 
     public void MovePlayer(Vector2 moveVector)
     {
-        
+        _divisionVector.MoveVectorChange(moveVector);
     }
 }
