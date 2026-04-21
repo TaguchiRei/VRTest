@@ -123,15 +123,28 @@ public class DivisionVector
         _rigidbody.linearVelocity += _movePower;
     }
 
-    /// <summary>
-    /// 移動力を排除する
-    /// </summary>
     public void StopMove()
     {
-        if (_movePower != Vector3.zero)
+        if (_movePower == Vector3.zero) return;
+
+        Vector3 velocity = _rigidbody.linearVelocity;
+        
+        Vector3 dir = _movePower.normalized;
+        
+        float current = Vector3.Dot(velocity, dir);
+        float previous = _movePower.magnitude;
+        float result = current - previous;
+        
+        if (current > 0f && result < 0f)
         {
-            _rigidbody.linearVelocity -= _movePower;
-            _movePower = Vector3.zero;
+            result = 0f;
         }
+        
+        Vector3 newMoveComponent = dir * result;
+        
+        Vector3 nonMoveComponent = velocity - (dir * current);
+        _rigidbody.linearVelocity = nonMoveComponent + newMoveComponent;
+
+        _movePower = Vector3.zero;
     }
 }
