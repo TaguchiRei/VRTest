@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public class PlaerController
+public class PlaerController : InitializableMonoBehaviour
 {
-    
+    public override void Initialize()
+    {
+        base.Initialize();
+    }
 }
