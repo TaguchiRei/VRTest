@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.InputSystem;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace UsefulTools.Editor

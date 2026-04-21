@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UsefulTOols.AutoGenerate
+namespace UsefulTools.AutoGenerate
 {
     [CreateAssetMenu(fileName = "BGMTypeLibrary", menuName = "UsefulTools/Audio/BGMTypeLibrary")]
     public class BGMTypeLibrary : ScriptableObject

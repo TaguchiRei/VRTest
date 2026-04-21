@@ -2,16 +2,13 @@
 
 namespace UsefulTools.AutoGenerate
 {
-    public enum PlayerActions
+    public enum VRControllersActions
     {
         Move,
         Look,
-        Attack,
-        Interact,
-        Crouch,
-        Jump,
-        Previous,
-        Next,
-        Sprint
+        PushGripLeft,
+        PushGripRight,
+        PushTriggerLeft,
+        PushTriggerRight
     }
 }

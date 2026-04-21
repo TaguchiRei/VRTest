@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class InitializableMonoBehaviour : MonoBehaviour, IComparable<InitializableMonoBehaviour>
 {
     public int InitializationOrder = 0;
-    [ShowOnly] public bool Initialized { get; private set; } = false;
+    [ShowOnly] public bool Initialized { get; protected set; } = false;
 
     private protected void Awake()
     {

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UsefulTools.AutoGenerate;
 
 [RequireComponent(typeof(PlayerInput))]
 public class InputDispatcher : MonoBehaviour, IInputDispatcher

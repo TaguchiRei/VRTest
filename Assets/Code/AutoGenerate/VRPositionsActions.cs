@@ -2,7 +2,7 @@
 
 namespace UsefulTools.AutoGenerate
 {
-    public enum VRActions
+    public enum VRPositionsActions
     {
         HeadPosition,
         HeadRotation,

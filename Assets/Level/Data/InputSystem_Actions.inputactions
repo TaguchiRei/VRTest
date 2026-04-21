@@ -82,7 +82,7 @@
                     "name": "Sprint",
                     "type": "Button",
                     "id": "641cd816-40e6-41b4-8c3d-04687c349290",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -993,7 +993,7 @@
             ]
         },
         {
-            "name": "VR",
+            "name": "VRPositions",
             "id": "8bae0ba0-98a0-44a1-b07f-97ca75c45fcf",
             "actions": [
                 {
@@ -1115,6 +1115,134 @@
                     "processors": "",
                     "groups": "",
                     "action": "HeadRotation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "VRControllers",
+            "id": "f1cb0415-73ed-43a9-9d86-3d9fae19ddc2",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "95436edf-d5e6-4dab-98d3-507935a7eab2",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Look",
+                    "type": "Value",
+                    "id": "7568f2e8-30fb-4ef3-afe6-fb055a397a86",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "PushGripLeft",
+                    "type": "Button",
+                    "id": "732a1cad-8def-4596-a3e8-2946d7b2a371",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PushGripRight",
+                    "type": "Button",
+                    "id": "fe0b6444-5f97-4ca9-ba6d-a6f436125624",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PushTriggerLeft",
+                    "type": "Button",
+                    "id": "e0b194c5-0a7a-44b6-be47-7014f10f843c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PushTriggerRight",
+                    "type": "Button",
+                    "id": "a6b4747d-19e7-43e2-a68b-4efa1a8288f7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "d3fb2519-103f-4007-aa85-1891942174bc",
+                    "path": "<XRController>{LeftHand}/{Primary2DAxis}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38f8e608-c79f-455b-8bfa-bdd82344aa8b",
+                    "path": "<XRController>{RightHand}/{Primary2DAxis}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ce0d6942-9c1c-47fc-98f9-50575830f2ff",
+                    "path": "<XRController>{LeftHand}/{Grip}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PushGripLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8cebe744-aa34-47bc-ab3d-ed2693076894",
+                    "path": "<XRController>{RightHand}/{GripButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PushGripRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4213db88-650b-48c0-a1e6-5a4e6f70e0fe",
+                    "path": "<XRController>{RightHand}/{TriggerButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PushTriggerLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "975e26d3-4be0-4af3-bc8e-3bf4b45643ca",
+                    "path": "<XRController>{LeftHand}/{TriggerButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PushTriggerRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
