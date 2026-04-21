@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UsefulTools.AutoGenerate;
 
-public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDispatcher>
+public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDispatcher, PlayerMovementService>
 {
     private IInputDispatcher _inputDispatcher;
     private PlayerMovementService _playerMovementService;
@@ -56,9 +56,10 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
     {
     }
 
-    public void Inject(IInputDispatcher t)
+    public void Inject(IInputDispatcher inputDispatcher, PlayerMovementService playerMovementService)
     {
-        _inputDispatcher = t;
+        _inputDispatcher = inputDispatcher;
+        _playerMovementService = playerMovementService;
     }
 
     private void Registration(bool register = true)

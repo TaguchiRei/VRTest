@@ -1,6 +1,6 @@
+using System;
 using Application;
 using UnityEngine;
-
 
 public class PlayerView : InitializableMonoBehaviour, IMovementView
 {

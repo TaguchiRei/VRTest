@@ -4,13 +4,15 @@ using UnityEngine.InputSystem;
 using UsefulTools.AutoGenerate;
 
 [RequireComponent(typeof(PlayerInput))]
-public class InputDispatcher : MonoBehaviour, IInputDispatcher
+public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 {
     public static IInputDispatcher Interface;
     private PlayerInput _playerInput;
 
-    private void Awake()
+    public override void Initialize()
     {
+        base.Initialize();
+        
         Interface = this;
         _playerInput = GetComponent<PlayerInput>();
         SwitchActionMap(nameof(ActionMaps.Player));
