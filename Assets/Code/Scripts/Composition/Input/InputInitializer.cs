@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class InputInitializer : MonoBehaviour
 {
-    public InputDispatcher _inputDispatcher;
+    public InputDispatcher InputDispatcher;
 
-    private void Initialize()
+    public void Initialize()
     {
-        _inputDispatcher.Initialize();
+        InputDispatcher.Initialize();
     }
 }

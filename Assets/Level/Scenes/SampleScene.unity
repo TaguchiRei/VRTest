@@ -1343,6 +1343,7 @@ GameObject:
   - component: {fileID: 971425170}
   - component: {fileID: 971425172}
   - component: {fileID: 971425171}
+  - component: {fileID: 971425173}
   m_Layer: 0
   m_Name: InputDispatcher
   m_TagString: Untagged
@@ -1377,6 +1378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cac8fb90d99ad334c9be2afa5497afd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputDispatcher
+  InitializationOrder: 0
 --- !u!114 &971425172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,6 +1409,19 @@ MonoBehaviour:
   m_DefaultActionMap: 
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &971425173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 971425169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90232efb168208e4db4ca011ea71b1cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Composition::InputInitializer
+  _inputDispatcher: {fileID: 971425171}
 --- !u!1 &1335860909
 GameObject:
   m_ObjectHideFlags: 0
