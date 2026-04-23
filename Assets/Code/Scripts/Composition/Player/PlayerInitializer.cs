@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerInitializer : MonoBehaviour
 {
-    [SerializeField] private PlayerView _playerView;
+    [SerializeField] private VrPlayerView vrPlayerView;
     [SerializeField] private PlayerController _playerController;
 
     [SerializeField] private float _moveSpeed;
@@ -12,10 +12,10 @@ public class PlayerInitializer : MonoBehaviour
 
     public void Initialize(InputDispatcher inputDispatcher)
     {
-        _playerView.Initialize();
+        vrPlayerView.Initialize();
         _playerController.Inject(inputDispatcher,
             new PlayerMovementService(
-                _playerView, new(new(_gravityVector, _gravityPower), new(_moveSpeed))));
+                vrPlayerView, new(new(_gravityVector, _gravityPower), new(_moveSpeed))));
         _playerController.Initialize();
     }
 }

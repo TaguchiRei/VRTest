@@ -6,7 +6,7 @@ namespace UsefulTools.AutoGenerate
     {
         Player,
         UI,
-        VRPositions,
+        VRTransform,
         VRControllers
     }
 }
