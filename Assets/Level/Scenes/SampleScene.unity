@@ -1639,6 +1639,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Controller::PlayerController
   InitializationOrder: 0
+  _cameraTransform: {fileID: 1585112573}
 --- !u!114 &1335860917
 MonoBehaviour:
   m_ObjectHideFlags: 0

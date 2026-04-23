@@ -6,6 +6,8 @@ using UsefulTools.AutoGenerate;
 
 public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDispatcher, PlayerMovementService>
 {
+    [SerializeField] private Transform _cameraTransform;
+
     private IInputDispatcher _inputDispatcher;
     private PlayerMovementService _playerMovementService;
 
@@ -22,8 +24,28 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
             return;
         }
 
+        if (_cameraTransform == null)
+        {
+            Debug.LogError("[PlayerController] CameraTransform is null");
+            Initialized = false;
+            return;
+        }
+
         Registration();
         DebugGUI.ObserveVariable("MoveInput", ObserveMoveInput);
+    }
+
+    private void Update()
+    {
+        if (Initialized)
+        {
+            // カメラのXZ平面上の向きを抽出
+            Vector3 forward = _cameraTransform.forward;
+            Vector2 lookDir = new Vector2(forward.x, forward.z);
+            
+            // 視線の向きを更新
+            _playerMovementService.UpdateLookDirection(lookDir);
+        }
     }
 
     private string ObserveMoveInput()

@@ -10,10 +10,12 @@ namespace Code.Scripts.Domain.Player
         public GravityValue Gravity { get; private set; }
         public MovePowerValue LastMovePower { get; private set; }
         public LookDirectionValue LookDirection { get; private set; }
+        public MoveSpeed MoveSpeed { get; private set; }
 
-        public PlayerMovementEntity(GravityValue gravity)
+        public PlayerMovementEntity(GravityValue gravity, MoveSpeed moveSpeed)
         {
             Gravity = gravity;
+            MoveSpeed = moveSpeed;
             LastMovePower = MovePowerValue.Zero;
             LookDirection = LookDirectionValue.Forward;
         }
@@ -31,6 +33,11 @@ namespace Code.Scripts.Domain.Player
         public void UpdateLookDirection(Vector2 direction)
         {
             LookDirection = new LookDirectionValue(direction);
+        }
+
+        public void UpdateMoveSpeed(MoveSpeed moveSpeed)
+        {
+            MoveSpeed = moveSpeed;
         }
     }
 }
