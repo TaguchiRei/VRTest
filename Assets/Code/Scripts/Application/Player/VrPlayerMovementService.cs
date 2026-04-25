@@ -25,14 +25,21 @@ namespace Application
         {
             var (neckPosition, weightedRotation) = _neckEstimator.EstimateNeckRootPosition(hmdRotation, hmdPosition);
             
+            // Y軸回転のみに制限
+            Vector3 euler = weightedRotation.eulerAngles;
+            Quaternion yOnlyRotation = Quaternion.Euler(0, euler.y, 0);
+
+            // 簡易的な移動検知（位置・Y軸回転の差分チェック）
             if (Vector3.Distance(neckPosition, _torsoEntity.Position) > 0.05f || 
-                Quaternion.Angle(weightedRotation, _torsoEntity.Rotation) > 5f)
+                Quaternion.Angle(yOnlyRotation, _torsoEntity.Rotation) > 5f)
             {
-                _torsoEntity.UpdateTorso(neckPosition, weightedRotation);
-                _view.UpdateTorso(neckPosition, weightedRotation);
+                _torsoEntity.UpdateTorso(neckPosition, yOnlyRotation);
+                _view.UpdateTorso(neckPosition, yOnlyRotation);
             }
 
-            Quaternion headLocal = Quaternion.Inverse(_torsoEntity.Rotation) * hmdRotation;
+            // 頭のローカル回転を算出
+            // 胴体がY軸回転のみとなったため、X, Z軸の傾きとY軸の差分がすべて頭のローカル回転として表現される
+            Quaternion headLocal = Quaternion.Inverse(yOnlyRotation) * hmdRotation;
             _torsoEntity.UpdateHeadLocalRotation(headLocal);
             _view.UpdateHeadLocalRotation(headLocal);
         }

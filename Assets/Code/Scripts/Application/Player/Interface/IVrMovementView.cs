@@ -13,5 +13,7 @@ namespace Application
         void UpdateRightHand(Vector3 position, Quaternion rotation);
         void UpdateTorso(Vector3 position, Quaternion rotation);
         void UpdateHeadLocalRotation(Quaternion localRotation);
+        void UpdateCapsuleHeight(float height);
+        void UpdateModelRootHeight(float y);
     }
 }

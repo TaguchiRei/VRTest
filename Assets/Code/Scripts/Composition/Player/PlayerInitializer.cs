@@ -1,11 +1,12 @@
 using Application;
+using Code.Scripts.Domain.Player;
 using Code.Scripts.Infrastructure.Player;
 using UnityEngine;
 
 public class PlayerInitializer : MonoBehaviour
 {
-    [SerializeField] private VrPlayerView vrPlayerView;
-    [SerializeField] private VrPlayerInfra vrPlayerInfra;
+    [SerializeField] private VrPlayerView _vrPlayerView;
+    [SerializeField] private VrPlayerInfra _vrPlayerInfra;
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _gravityPower;
@@ -13,10 +14,14 @@ public class PlayerInitializer : MonoBehaviour
 
     public void Initialize(InputDispatcher inputDispatcher)
     {
-        vrPlayerView.Initialize();
-        vrPlayerInfra.Inject(inputDispatcher,
-            new VrPlayerMovementService(
-                vrPlayerView, new(new(_gravityVector, _gravityPower), new(_moveSpeed))));
-        vrPlayerInfra.Initialize();
+        _vrPlayerView.Initialize();
+
+        var torsoEntity = new TorsoEntity(
+            _vrPlayerView.transform.position,
+            _vrPlayerView.transform.rotation);
+        
+        _vrPlayerInfra.Inject(inputDispatcher,
+            new VrPlayerMovementService(_vrPlayerView, new(new GravityValue(), new MoveSpeed()), torsoEntity));
+        _vrPlayerInfra.Initialize();
     }
 }
