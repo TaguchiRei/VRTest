@@ -11,7 +11,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
     public override void Initialize()
     {
         base.Initialize();
-        
+
         _playerInput = GetComponent<PlayerInput>();
     }
 
@@ -24,7 +24,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 
     public void ChangeRegistrationStarted<TAction>(ActionMaps actionMap, TAction actionName,
         Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+        bool isRegister) where TAction : Enum
     {
         var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
 
@@ -34,7 +34,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
             return;
         }
 
-        if (registration == Registration.Register)
+        if (isRegister)
         {
             inputAction.started += action;
         }
@@ -46,7 +46,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 
     public void ChangeRegistrationPerformed<TAction>(ActionMaps actionMap, TAction actionName,
         Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+        bool isRegister) where TAction : Enum
     {
         var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
 
@@ -56,7 +56,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
             return;
         }
 
-        if (registration == Registration.Register)
+        if (isRegister)
         {
             inputAction.performed += action;
         }
@@ -68,7 +68,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 
     public void ChangeRegistrationCancelled<TAction>(ActionMaps actionMap, TAction actionName,
         Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+        bool isRegister) where TAction : Enum
     {
         var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
 
@@ -78,7 +78,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
             return;
         }
 
-        if (registration == Registration.Register)
+        if (isRegister)
         {
             inputAction.canceled += action;
         }
@@ -90,7 +90,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 
     public void ChangeRegistrationAll<TAction>(ActionMaps actionMap, TAction actionName,
         Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+        bool isRegister) where TAction : Enum
     {
         var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
 
@@ -100,7 +100,7 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
             return;
         }
 
-        if (registration == Registration.Register)
+        if (isRegister)
         {
             inputAction.started += action;
             inputAction.performed += action;
@@ -114,9 +114,8 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
         }
     }
 
-    public void ChangeRegistrationStartCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+    public void ChangeRegistrationPerformedCancelled<TAction>(ActionMaps actionMap, TAction actionName, Action<InputAction.CallbackContext> action,
+        bool isRegister) where TAction : Enum
     {
         var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
 
@@ -126,7 +125,31 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
             return;
         }
 
-        if (registration == Registration.Register)
+        if (isRegister)
+        {
+            inputAction.performed += action;
+            inputAction.canceled += action;
+        }
+        else
+        {
+            inputAction.performed -= action;
+            inputAction.canceled -= action;
+        }
+    }
+
+    public void ChangeRegistrationStartCancelled<TAction>(ActionMaps actionMap, TAction actionName,
+        Action<InputAction.CallbackContext> action,
+        bool isRegister) where TAction : Enum
+    {
+        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
+
+        if (inputAction == null)
+        {
+            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+            return;
+        }
+
+        if (isRegister)
         {
             inputAction.started += action;
             inputAction.canceled += action;

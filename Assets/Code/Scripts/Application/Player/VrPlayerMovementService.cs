@@ -32,7 +32,7 @@ namespace Application
                 _entity.LastMovePower.Value
             );
 
-            // 新しい移動ベクトルを計算（視線の向きを考慮）
+            // 新しい移動ベクトルを計算
             Vector3 newMoveVector = MovementLogic.CalculateMoveVector(
                 input,
                 _entity.Gravity.Direction,

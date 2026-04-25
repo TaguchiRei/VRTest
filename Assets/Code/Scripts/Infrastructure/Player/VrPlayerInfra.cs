@@ -12,7 +12,7 @@ namespace Code.Scripts.Infrastructure.Player
         private IInputDispatcher _inputDispatcher;
         private VrPlayerMovementService _vrPlayerMovementService;
 
-        private Vector2 _moveInputValue;
+        [SerializeField] Vector2 _moveInputValue;
 
         public override void Initialize()
         {
@@ -32,7 +32,7 @@ namespace Code.Scripts.Infrastructure.Player
                 return;
             }
 
-            Registration();
+            ChangeRegistration();
             _inputDispatcher.EnableActionMap(ActionMaps.VRTransform);
             _inputDispatcher.EnableActionMap(ActionMaps.VRControllers);
             DebugGUI.ObserveVariable("MoveInput", () => _moveInputValue.ToString());
@@ -62,12 +62,13 @@ namespace Code.Scripts.Infrastructure.Player
 
         private void OnDestroy()
         {
-            Registration(false);
+            ChangeRegistration(false);
         }
 
         public void OnMove(InputAction.CallbackContext context)
         {
             _moveInputValue = context.ReadValue<Vector2>();
+            Debug.Log($"OnMove {context.ReadValue<Vector2>()}");
         }
 
         public void OnLook(InputAction.CallbackContext context)
@@ -112,52 +113,49 @@ namespace Code.Scripts.Infrastructure.Player
             _vrPlayerMovementService = vrPlayerMovementService;
         }
 
-        private void Registration(bool register = true)
+        private void ChangeRegistration(bool register = true)
         {
-            Registration registration = new Registration();
-
-            _inputDispatcher.ChangeRegistrationAll(
+            _inputDispatcher.ChangeRegistrationPerformedCancelled(
                 ActionMaps.VRControllers,
                 VRControllersActions.Move,
                 OnMove,
-                registration);
-
-            _inputDispatcher.ChangeRegistrationAll(
+                register);
+            _inputDispatcher.ChangeRegistrationPerformedCancelled(
                 ActionMaps.VRControllers,
                 VRControllersActions.Look,
                 OnLook,
-                registration);
+                register);
             _inputDispatcher.ChangeRegistrationAll(
                 ActionMaps.VRControllers,
                 VRControllersActions.PushGripLeft,
                 OnGripLeft,
-                registration);
+                register);
             _inputDispatcher.ChangeRegistrationAll(
                 ActionMaps.VRControllers,
                 VRControllersActions.PushGripRight,
                 OnGripRight,
-                registration);
+                register);
             _inputDispatcher.ChangeRegistrationAll(
                 ActionMaps.VRControllers,
                 VRControllersActions.PushTriggerLeft,
                 OnTriggerLeft,
-                registration);
+                register);
             _inputDispatcher.ChangeRegistrationAll(
                 ActionMaps.VRControllers,
                 VRControllersActions.PushTriggerRight,
                 OnTriggerRight,
-                registration);
+                register);
 
             _inputDispatcher.ChangeRegistrationAll(
                 ActionMaps.VRTransform,
                 VRTransformActions.HeadPosition,
                 OnHmdMove,
-                registration);
+                register);
             _inputDispatcher.ChangeRegistrationAll(
                 ActionMaps.VRTransform,
                 VRTransformActions.HeadRotation,
                 OnHmdRotate,
-                registration);
+                register);
         }
     }
 }
