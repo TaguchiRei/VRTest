@@ -6,34 +6,31 @@ using UsefulTools.AutoGenerate;
 [RequireComponent(typeof(PlayerInput))]
 public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 {
+    public static IInputDispatcher Interface;
     private PlayerInput _playerInput;
 
     public override void Initialize()
     {
         base.Initialize();
         
+        Interface = this;
         _playerInput = GetComponent<PlayerInput>();
+        SwitchActionMap(nameof(ActionMaps.Player));
     }
 
     private void OnDestroy()
     {
         _playerInput.actions.Disable();
         _playerInput.actions = null;
+
+        Interface = null;
     }
 
-
-    public void ChangeRegistrationStarted<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+    public void ChangeActionRegistrationStart(string actionMap, string actionName,
+        Action<InputAction.CallbackContext> action, Registration registration)
     {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-
-        if (inputAction == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
-        }
-
+        var inputAction = GetAction(actionMap, actionName);
+        if (inputAction == null) return;
         if (registration == Registration.Register)
         {
             inputAction.started += action;
@@ -44,18 +41,11 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
         }
     }
 
-    public void ChangeRegistrationPerformed<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+    public void ChangeActionRegistrationPerformed(string actionMap, string actionName,
+        Action<InputAction.CallbackContext> action, Registration registration)
     {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-
-        if (inputAction == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
-        }
-
+        var inputAction = GetAction(actionMap, actionName);
+        if (inputAction == null) return;
         if (registration == Registration.Register)
         {
             inputAction.performed += action;
@@ -66,18 +56,11 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
         }
     }
 
-    public void ChangeRegistrationCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+    public void ChangeActionRegistrationCancelled(string actionMap, string actionName,
+        Action<InputAction.CallbackContext> action, Registration registration)
     {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-
-        if (inputAction == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
-        }
-
+        var inputAction = GetAction(actionMap, actionName);
+        if (inputAction == null) return;
         if (registration == Registration.Register)
         {
             inputAction.canceled += action;
@@ -88,18 +71,11 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
         }
     }
 
-    public void ChangeRegistrationAll<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+    public void ChangeActionRegistrationAll(string actionMap, string actionName,
+        Action<InputAction.CallbackContext> action, Registration registration)
     {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-
-        if (inputAction == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
-        }
-
+        var inputAction = GetAction(actionMap, actionName);
+        if (inputAction == null) return;
         if (registration == Registration.Register)
         {
             inputAction.started += action;
@@ -114,18 +90,11 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
         }
     }
 
-    public void ChangeRegistrationStartCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action,
-        Registration registration) where TAction : Enum
+    public void ChangeActionRegistrationStartCancelled(string actionMap, string actionName,
+        Action<InputAction.CallbackContext> action, Registration registration)
     {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-
-        if (inputAction == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
-        }
-
+        var inputAction = GetAction(actionMap, actionName);
+        if (inputAction == null) return;
         if (registration == Registration.Register)
         {
             inputAction.started += action;
@@ -138,80 +107,36 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
         }
     }
 
-    public void SwitchActionMap(ActionMaps actionMap)
+    private InputAction GetAction(string actionMap, string actionName)
     {
-        if (_playerInput == null) return;
+        if (_playerInput == null) return null;
 
-        var targetMap = _playerInput.actions.FindActionMap(actionMap.ToString());
-
-        if (targetMap == null)
+        var map = _playerInput.actions.FindActionMap(actionMap);
+        if (map == null)
         {
-            Debug.LogWarning($"[InputDispatcher] ActionMap {actionMap} は見つかりませんでした。");
-            return;
+            throw new ArgumentException();
         }
 
-        foreach (var map in _playerInput.actions.actionMaps)
+        var action = map.FindAction(actionName);
+        if (action == null)
         {
-            map.Disable();
+            throw new ArgumentException();
         }
 
-        targetMap.Enable();
+        return action;
     }
 
-    public void EnableActionMap(ActionMaps actionMap)
+    public void SwitchActionMap(string actionMap)
     {
         if (_playerInput == null) return;
-
-        var targetMap = _playerInput.actions.FindActionMap(actionMap.ToString());
-
-        if (targetMap == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] ActionMap {actionMap} は見つかりませんでした。");
-            return;
-        }
-
-        targetMap.Enable();
+        _playerInput.SwitchCurrentActionMap(actionMap);
     }
 
-    public void DisableActionMap(ActionMaps actionMap)
+    public int GetActiveActionMap()
     {
-        if (_playerInput == null) return;
-
-        var targetMap = _playerInput.actions.FindActionMap(actionMap.ToString());
-
-        if (targetMap == null)
-        {
-            Debug.LogWarning($"[InputDispatcher] ActionMap {actionMap} は見つかりませんでした。");
-            return;
-        }
-
-        targetMap.Disable();
-    }
-
-    public ActionMaps[] GetActiveActionMap()
-    {
-        if (_playerInput == null)
-        {
-            return Array.Empty<ActionMaps>();
-        }
-
-        var activeMaps = new System.Collections.Generic.List<ActionMaps>();
-
-        foreach (var map in _playerInput.actions.actionMaps)
-        {
-            if (!map.enabled) continue;
-
-            if (Enum.TryParse(map.name, out ActionMaps parsedMap))
-            {
-                activeMaps.Add(parsedMap);
-            }
-            else
-            {
-                Debug.LogWarning($"[InputDispatcher] ActionMap {map.name} は見つかりませんでした。");
-            }
-        }
-
-        return activeMaps.ToArray();
+        if (_playerInput == null) return 0;
+        Enum.TryParse<ActionMaps>(_playerInput.currentActionMap.name, out var parseMap);
+        return (int)parseMap;
     }
 
     public void EnableInput()
@@ -222,24 +147,5 @@ public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
     public void DisableInput()
     {
         _playerInput.actions.Disable();
-    }
-
-    private InputAction GetAction(string actionMap, string actionName)
-    {
-        if (_playerInput == null) return null;
-
-        var map = _playerInput.actions.FindActionMap(actionMap);
-        if (map == null)
-        {
-            return null;
-        }
-
-        var action = map.FindAction(actionName);
-        if (action == null)
-        {
-            return null;
-        }
-
-        return action;
     }
 }

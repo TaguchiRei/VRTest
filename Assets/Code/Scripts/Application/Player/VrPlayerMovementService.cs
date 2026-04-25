@@ -24,17 +24,17 @@ namespace Application
         /// </summary>
         public void HandleHeadAndBodyMovement(Vector3 hmdLocalPos, Quaternion hmdLocalRot)
         {
-            // 首の位置と回転を推定
-            var (neckLocalPos, neckLocalRotation) = _neckRootEstimator.EstimateNeckRootPosition(hmdLocalRot, hmdLocalPos);
+            // 1. 首の位置と回転を推定
+            var (neckLocalPos, neckLocalRot) = _neckRootEstimator.EstimateNeckRootPosition(hmdLocalRot, hmdLocalPos);
 
-            //  首の回転を適用
-            _view.UpdateNeckRotation(neckLocalRotation);
+            // 2. 首の回転を適用
+            _view.UpdateNeckRotation(neckLocalRot);
 
-            // 頭の回転を適用（HMDの回転から首の回転を引いた残り分）
-            Quaternion headLocalRot = Quaternion.Inverse(neckLocalRotation) * hmdLocalRot;
+            // 3. 頭の回転を適用（HMDの回転から首の回転を引いた残り分）
+            Quaternion headLocalRot = Quaternion.Inverse(neckLocalRot) * hmdLocalRot;
             _view.UpdateHeadRotation(headLocalRot);
 
-            // 水平方向のズレを計算して身体を移動
+            // 4. 水平方向のズレを計算して身体を移動
             // neckLocalPos.x と z が 0 になるように Root を動かす
             Vector3 worldShift = _view.WorldRotation * new Vector3(neckLocalPos.x, 0, neckLocalPos.z);
             _view.ShiftPosition(worldShift);
