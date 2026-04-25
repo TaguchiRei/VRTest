@@ -2,7 +2,7 @@ using System;
 using Application;
 using UnityEngine;
 
-public class VrPlayerView : InitializableMonoBehaviour, IMovementView
+public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
 {
     [SerializeField] private Rigidbody _rigidbody;
     [SerializeField] private Transform _cameraTransform;

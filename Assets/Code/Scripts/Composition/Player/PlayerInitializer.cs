@@ -14,7 +14,7 @@ public class PlayerInitializer : MonoBehaviour
     {
         vrPlayerView.Initialize();
         _playerController.Inject(inputDispatcher,
-            new PlayerMovementService(
+            new VrPlayerMovementService(
                 vrPlayerView, new(new(_gravityVector, _gravityPower), new(_moveSpeed))));
         _playerController.Initialize();
     }

@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UsefulTools.AutoGenerate;
 
-public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDispatcher, PlayerMovementService>
+public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDispatcher, VrPlayerMovementService>
 {
     [SerializeField] private Transform _cameraTransform;
 
     private IInputDispatcher _inputDispatcher;
-    private PlayerMovementService _playerMovementService;
+    private VrPlayerMovementService _vrPlayerMovementService;
 
     private Vector2 _moveInputValue;
 
@@ -44,7 +44,7 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
             Vector2 lookDir = new Vector2(forward.x, forward.z);
             
             // 視線の向きを更新
-            _playerMovementService.UpdateLookDirection(lookDir);
+            _vrPlayerMovementService.UpdateLookDirection(lookDir);
         }
     }
 
@@ -67,8 +67,8 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
     {
         if (Initialized)
         {
-            _playerMovementService.ApplyGravity();
-            _playerMovementService.Move(_moveInputValue);
+            _vrPlayerMovementService.ApplyGravity();
+            _vrPlayerMovementService.Move(_moveInputValue);
         }
     }
 
@@ -92,10 +92,10 @@ public class PlayerController : InitializableMonoBehaviour, IInjectable<IInputDi
     {
     }
 
-    public void Inject(IInputDispatcher inputDispatcher, PlayerMovementService playerMovementService)
+    public void Inject(IInputDispatcher inputDispatcher, VrPlayerMovementService vrPlayerMovementService)
     {
         _inputDispatcher = inputDispatcher;
-        _playerMovementService = playerMovementService;
+        _vrPlayerMovementService = vrPlayerMovementService;
     }
 
     private void Registration(bool register = true)

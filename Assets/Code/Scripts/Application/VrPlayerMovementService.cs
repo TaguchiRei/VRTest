@@ -7,18 +7,17 @@ namespace Application
     /// <summary>
     /// プレイヤーの移動ユースケースを制御するサービス
     /// </summary>
-    public class PlayerMovementService
+    public class VrPlayerMovementService
     {
-        private readonly IMovementView _view;
+        private readonly IVrMovementView _view;
         private readonly PlayerMovementEntity _entity;
 
-        public PlayerMovementService(IMovementView view, PlayerMovementEntity entity)
+        public VrPlayerMovementService(IVrMovementView view, PlayerMovementEntity entity)
         {
             _view = view;
             _entity = entity;
         }
 
-        /// <summary>
         /// <summary>
         /// 入力に基づいてプレイヤーを移動させる
         /// </summary>
@@ -29,14 +28,14 @@ namespace Application
 
             // 前回の移動成分を取り除いた速度を計算
             Vector3 velocityWithoutLastMove = MovementLogic.CalculateVelocityAfterStop(
-                currentVelocity, 
+                currentVelocity,
                 _entity.LastMovePower.Value
             );
 
             // 新しい移動ベクトルを計算（視線の向きを考慮）
             Vector3 newMoveVector = MovementLogic.CalculateMoveVector(
-                input, 
-                _entity.Gravity.Direction, 
+                input,
+                _entity.Gravity.Direction,
                 _entity.LookDirection.Value
             );
 
@@ -45,6 +44,16 @@ namespace Application
 
             // Viewに反映
             _view.Velocity = velocityWithoutLastMove + newMoveVector;
+        }
+
+        public void UpdateHandPosition(
+            Vector3 leftHandPosition,
+            Vector3 rightHandPosition,
+            Quaternion leftHandRotation,
+            Quaternion rightHandRotation)
+        {
+            _view.UpdateLeftHand(leftHandPosition, leftHandRotation);
+            _view.UpdateRightHand(rightHandPosition, rightHandRotation);
         }
 
         /// <summary>
