@@ -33,7 +33,9 @@ namespace Code.Scripts.Infrastructure.Player
             }
 
             Registration();
-            DebugGUI.ObserveVariable("MoveInput", ObserveMoveInput);
+            _inputDispatcher.EnableActionMap(ActionMaps.VRTransform);
+            _inputDispatcher.EnableActionMap(ActionMaps.VRControllers);
+            DebugGUI.ObserveVariable("MoveInput", () => _moveInputValue.ToString());
         }
 
         private void Update()
@@ -49,9 +51,13 @@ namespace Code.Scripts.Infrastructure.Player
             }
         }
 
-        private string ObserveMoveInput()
+        private void FixedUpdate()
         {
-            return _moveInputValue.ToString();
+            if (Initialized)
+            {
+                _vrPlayerMovementService.ApplyGravity();
+                _vrPlayerMovementService.Move(_moveInputValue);
+            }
         }
 
         private void OnDestroy()
@@ -64,33 +70,40 @@ namespace Code.Scripts.Infrastructure.Player
             _moveInputValue = context.ReadValue<Vector2>();
         }
 
-        private void FixedUpdate()
-        {
-            if (Initialized)
-            {
-                _vrPlayerMovementService.ApplyGravity();
-                _vrPlayerMovementService.Move(_moveInputValue);
-            }
-        }
-
         public void OnLook(InputAction.CallbackContext context)
         {
         }
 
+        public void OnHmdMove(InputAction.CallbackContext context)
+        {
+            Debug.Log($"HMDMove");
+            Debug.Log($"{context.ReadValue<Vector3>()} HMD Position");
+        }
+
+        public void OnHmdRotate(InputAction.CallbackContext context)
+        {
+            Debug.Log($"HMDMove");
+            Debug.Log($"{context.ReadValue<Vector3>()} HMD Position");
+        }
+
         public void OnGripLeft(InputAction.CallbackContext context)
         {
+            Debug.Log("GripLeft");
         }
 
         public void OnGripRight(InputAction.CallbackContext context)
         {
+            Debug.Log("GripRight");
         }
 
         public void OnTriggerLeft(InputAction.CallbackContext context)
         {
+            Debug.Log("TriggerLeft");
         }
 
         public void OnTriggerRight(InputAction.CallbackContext context)
         {
+            Debug.Log("TriggerLeft");
         }
 
         public void Inject(IInputDispatcher inputDispatcher, VrPlayerMovementService vrPlayerMovementService)
@@ -133,6 +146,17 @@ namespace Code.Scripts.Infrastructure.Player
                 ActionMaps.VRControllers,
                 VRControllersActions.PushTriggerRight,
                 OnTriggerRight,
+                registration);
+
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRTransform,
+                VRTransformActions.HeadPosition,
+                OnHmdMove,
+                registration);
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRTransform,
+                VRTransformActions.HeadRotation,
+                OnHmdRotate,
                 registration);
         }
     }
