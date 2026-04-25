@@ -11,11 +11,30 @@ namespace Application
     {
         private readonly IVrMovementView _view;
         private readonly PlayerMovementEntity _entity;
+        private readonly TorsoEntity _torsoEntity;
+        private readonly NeckRootEstimator _neckEstimator = new();
 
-        public VrPlayerMovementService(IVrMovementView view, PlayerMovementEntity entity)
+        public VrPlayerMovementService(IVrMovementView view, PlayerMovementEntity entity, TorsoEntity torsoEntity)
         {
             _view = view;
             _entity = entity;
+            _torsoEntity = torsoEntity;
+        }
+
+        public void UpdateHmdState(Vector3 hmdPosition, Quaternion hmdRotation)
+        {
+            var (neckPosition, weightedRotation) = _neckEstimator.EstimateNeckRootPosition(hmdRotation, hmdPosition);
+            
+            if (Vector3.Distance(neckPosition, _torsoEntity.Position) > 0.05f || 
+                Quaternion.Angle(weightedRotation, _torsoEntity.Rotation) > 5f)
+            {
+                _torsoEntity.UpdateTorso(neckPosition, weightedRotation);
+                _view.UpdateTorso(neckPosition, weightedRotation);
+            }
+
+            Quaternion headLocal = Quaternion.Inverse(_torsoEntity.Rotation) * hmdRotation;
+            _torsoEntity.UpdateHeadLocalRotation(headLocal);
+            _view.UpdateHeadLocalRotation(headLocal);
         }
 
         /// <summary>
