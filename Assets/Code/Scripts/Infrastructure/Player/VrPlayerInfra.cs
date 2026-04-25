@@ -107,17 +107,16 @@ namespace Code.Scripts.Infrastructure.Player
             Vector3 forward = _cameraTransform.forward;
             _vrPlayerMovementService.UpdateLookDirection(new Vector2(forward.x, forward.z));
 
-            // HMD位置をポーリング
+            // HMD位置と回転をポーリングして更新
             var hmdPosCtx = _inputDispatcher.ReadValue<Vector3, VRTransformActions>(
                 ActionMaps.VRTransform, VRTransformActions.HeadPosition);
-            if (hmdPosCtx.IsActive)
-                Debug.Log($"{hmdPosCtx.Value} HMD Position");
-
-            // HMD回転をポーリング
             var hmdRotCtx = _inputDispatcher.ReadValue<Quaternion, VRTransformActions>(
                 ActionMaps.VRTransform, VRTransformActions.HeadRotation);
-            if (hmdRotCtx.IsActive)
-                Debug.Log($"{hmdRotCtx.Value} HMD Rotation");
+            
+            if (hmdPosCtx.IsActive && hmdRotCtx.IsActive)
+            {
+                _vrPlayerMovementService.UpdateHmdState(hmdPosCtx.Value, hmdRotCtx.Value);
+            }
         }
 
         private void ChangeRegistration(bool register = true)

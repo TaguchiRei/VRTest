@@ -8,6 +8,8 @@ public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private Transform _leftHandTransform;
     [SerializeField] private Transform _rightHandTransform;
+    [SerializeField] private Transform _torsoTransform;
+    [SerializeField] private Transform _headTransform;
 
     public Vector3 Velocity
     {
@@ -41,5 +43,22 @@ public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
     {
         _rightHandTransform.position = position;
         _rightHandTransform.rotation = rotation;
+    }
+
+    public void UpdateTorso(Vector3 position, Quaternion rotation)
+    {
+        if (_torsoTransform != null)
+        {
+            _torsoTransform.position = position;
+            _torsoTransform.rotation = rotation;
+        }
+    }
+
+    public void UpdateHeadLocalRotation(Quaternion localRotation)
+    {
+        if (_headTransform != null)
+        {
+            _headTransform.localRotation = localRotation;
+        }
     }
 }
