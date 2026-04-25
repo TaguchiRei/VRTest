@@ -43,7 +43,7 @@ namespace Code.Scripts.Infrastructure.Player
                 // カメラのXZ平面上の向きを抽出
                 Vector3 forward = _cameraTransform.forward;
                 Vector2 lookDir = new Vector2(forward.x, forward.z);
-            
+
                 // 視線の向きを更新
                 _vrPlayerMovementService.UpdateLookDirection(lookDir);
             }
@@ -103,35 +103,35 @@ namespace Code.Scripts.Infrastructure.Player
         {
             Registration registration = new Registration();
 
-            _inputDispatcher.ChangeActionRegistrationAll(
-                nameof(ActionMaps.VRControllers),
-                nameof(VRControllersActions.Move),
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRControllers,
+                VRControllersActions.Move,
                 OnMove,
                 registration);
 
-            _inputDispatcher.ChangeActionRegistrationAll(
-                nameof(ActionMaps.VRControllers),
-                nameof(VRControllersActions.Look),
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRControllers,
+                VRControllersActions.Look,
                 OnLook,
                 registration);
-            _inputDispatcher.ChangeActionRegistrationAll(
-                nameof(ActionMaps.VRControllers),
-                nameof(VRControllersActions.PushGripLeft),
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRControllers,
+                VRControllersActions.PushGripLeft,
                 OnGripLeft,
                 registration);
-            _inputDispatcher.ChangeActionRegistrationAll(
-                nameof(ActionMaps.VRControllers),
-                nameof(VRControllersActions.PushGripRight),
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRControllers,
+                VRControllersActions.PushGripRight,
                 OnGripRight,
                 registration);
-            _inputDispatcher.ChangeActionRegistrationAll(
-                nameof(ActionMaps.VRControllers),
-                nameof(VRControllersActions.PushTriggerLeft),
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRControllers,
+                VRControllersActions.PushTriggerLeft,
                 OnTriggerLeft,
                 registration);
-            _inputDispatcher.ChangeActionRegistrationAll(
-                nameof(ActionMaps.VRControllers),
-                nameof(VRControllersActions.PushTriggerRight),
+            _inputDispatcher.ChangeRegistrationAll(
+                ActionMaps.VRControllers,
+                VRControllersActions.PushTriggerRight,
                 OnTriggerRight,
                 registration);
         }
