@@ -46,7 +46,7 @@ namespace Application
             _view.Velocity = velocityWithoutLastMove + newMoveVector;
         }
 
-        public void UpdateHandTransform(
+        public void UpdateHandPosition(
             Vector3 leftHandPosition,
             Vector3 rightHandPosition,
             Quaternion leftHandRotation,
@@ -54,11 +54,6 @@ namespace Application
         {
             _view.UpdateLeftHand(leftHandPosition, leftHandRotation);
             _view.UpdateRightHand(rightHandPosition, rightHandRotation);
-        }
-
-        public void UpdateNeckRotation(Quaternion rotation)
-        {
-            _view.UpdateNeckRotation(rotation);
         }
 
         /// <summary>

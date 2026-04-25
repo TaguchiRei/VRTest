@@ -5,7 +5,7 @@ using UnityEngine;
 public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
 {
     [SerializeField] private Rigidbody _rigidbody;
-    [SerializeField] private Transform _neckTransform;
+    [SerializeField] private Transform _cameraTransform;
     [SerializeField] private Transform _leftHandTransform;
     [SerializeField] private Transform _rightHandTransform;
 
@@ -26,20 +26,20 @@ public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
         _rigidbody.AddForce(force, mode);
     }
 
-    public void UpdateNeckRotation(Quaternion rotation)
+    public void CameraRotation(Quaternion rotation)
     {
-        _neckTransform.localRotation = rotation;
+        _cameraTransform.rotation = rotation;
     }
 
     public void UpdateLeftHand(Vector3 position, Quaternion rotation)
     {
-        _leftHandTransform.localPosition = position;
-        _leftHandTransform.localRotation = rotation;
+        _leftHandTransform.position = position;
+        _leftHandTransform.rotation = rotation;
     }
 
     public void UpdateRightHand(Vector3 position, Quaternion rotation)
     {
-        _rightHandTransform.localPosition = position;
-        _rightHandTransform.localRotation = rotation;
+        _rightHandTransform.position = position;
+        _rightHandTransform.rotation = rotation;
     }
 }
