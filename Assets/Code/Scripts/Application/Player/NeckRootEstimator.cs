@@ -21,7 +21,7 @@ public class NeckRootEstimator
     /// HMD回転・位置から首の根本の位置を推定する
     /// HMDの回転から、首に対するベクトルが分かるため、HMDの位置からそのベクトル分を引いた位置を首の位置としている
     /// </summary>
-    public Vector3 EstimateNeckRootPosition(
+    public (Vector3, Quaternion) EstimateNeckRootPosition(
         Quaternion hmdRotation,
         Vector3 hmdPosition)
     {
@@ -50,7 +50,7 @@ public class NeckRootEstimator
         // 頭位置から首位置逆算
         Vector3 neckPosition = hmdPosition - rotatedOffset;
 
-        return neckPosition;
+        return (neckPosition, weightedRotation);
     }
 
     /// <summary>
