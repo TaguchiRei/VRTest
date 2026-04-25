@@ -9,6 +9,7 @@ public class IngameComposition : MonoBehaviour
     private void Start()
     {
         _inputInitializer.Initialize();
+        
         _playerInitializer.Initialize(_inputInitializer.InputDispatcher);
     }
 }

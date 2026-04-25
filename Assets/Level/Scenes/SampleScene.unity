@@ -1615,6 +1615,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Controller::PlayerController
   InitializationOrder: 0
   _cameraTransform: {fileID: 1585112573}
+  _moveInputValue: {x: 0, y: 0}
 --- !u!114 &1335860917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1629,7 +1630,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Composition::PlayerInitializer
   vrPlayerView: {fileID: 1335860915}
   vrPlayerInfra: {fileID: 1335860916}
-  _moveSpeed: 10
+  _moveSpeed: 20
   _gravityPower: 9.81
   _gravityVector: {x: 0, y: -1, z: 0}
 --- !u!1 &1408721900

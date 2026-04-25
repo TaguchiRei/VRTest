@@ -12,7 +12,7 @@ namespace Code.Scripts.Infrastructure.Player
         private IInputDispatcher _inputDispatcher;
         private VrPlayerMovementService _vrPlayerMovementService;
 
-        [SerializeField] Vector2 _moveInputValue;
+        private Vector2 _moveInputValue;
 
         public override void Initialize()
         {
@@ -38,41 +38,9 @@ namespace Code.Scripts.Infrastructure.Player
             DebugGUI.ObserveVariable("MoveInput", () => _moveInputValue.ToString());
         }
 
-        private void Update()
-        {
-            if (Initialized)
-            {
-                // カメラのXZ平面上の向きを抽出
-                Vector3 forward = _cameraTransform.forward;
-                Vector2 lookDir = new Vector2(forward.x, forward.z);
-
-                // 視線の向きを更新
-                _vrPlayerMovementService.UpdateLookDirection(lookDir);
-            }
-        }
-
-        private void FixedUpdate()
-        {
-            if (Initialized)
-            {
-                _vrPlayerMovementService.ApplyGravity();
-                _vrPlayerMovementService.Move(_moveInputValue);
-            }
-        }
-
         private void OnDestroy()
         {
             ChangeRegistration(false);
-        }
-
-        public void OnMove(InputAction.CallbackContext context)
-        {
-            _moveInputValue = context.ReadValue<Vector2>();
-            Debug.Log($"OnMove {context.ReadValue<Vector2>()}");
-        }
-
-        public void OnLook(InputAction.CallbackContext context)
-        {
         }
 
         public void OnHmdMove(InputAction.CallbackContext context)
@@ -84,7 +52,7 @@ namespace Code.Scripts.Infrastructure.Player
         public void OnHmdRotate(InputAction.CallbackContext context)
         {
             Debug.Log($"HMDMove");
-            Debug.Log($"{context.ReadValue<Vector3>()} HMD Position");
+            Debug.Log($"{context.ReadValue<Quaternion>()} HMD Position");
         }
 
         public void OnGripLeft(InputAction.CallbackContext context)
@@ -113,49 +81,55 @@ namespace Code.Scripts.Infrastructure.Player
             _vrPlayerMovementService = vrPlayerMovementService;
         }
 
+        private void FixedUpdate()
+        {
+            if (!Initialized) return;
+
+            var moveCtx = _inputDispatcher.ReadValue<Vector2, VRControllersActions>(
+                ActionMaps.VRControllers, VRControllersActions.Move);
+
+            _moveInputValue = moveCtx.Phase switch
+            {
+                InputActionPhase.Disabled => Vector2.zero,
+                InputActionPhase.Waiting => Vector2.zero,
+                _ => moveCtx.Value
+            };
+
+            _vrPlayerMovementService.ApplyGravity();
+            _vrPlayerMovementService.Move(_moveInputValue);
+        }
+
+        private void Update()
+        {
+            if (!Initialized) return;
+
+            // カメラの向きを更新
+            Vector3 forward = _cameraTransform.forward;
+            _vrPlayerMovementService.UpdateLookDirection(new Vector2(forward.x, forward.z));
+
+            // HMD位置をポーリング
+            var hmdPosCtx = _inputDispatcher.ReadValue<Vector3, VRTransformActions>(
+                ActionMaps.VRTransform, VRTransformActions.HeadPosition);
+            if (hmdPosCtx.IsActive)
+                Debug.Log($"{hmdPosCtx.Value} HMD Position");
+
+            // HMD回転をポーリング
+            var hmdRotCtx = _inputDispatcher.ReadValue<Quaternion, VRTransformActions>(
+                ActionMaps.VRTransform, VRTransformActions.HeadRotation);
+            if (hmdRotCtx.IsActive)
+                Debug.Log($"{hmdRotCtx.Value} HMD Rotation");
+        }
+
         private void ChangeRegistration(bool register = true)
         {
-            _inputDispatcher.ChangeRegistrationPerformedCancelled(
-                ActionMaps.VRControllers,
-                VRControllersActions.Move,
-                OnMove,
-                register);
-            _inputDispatcher.ChangeRegistrationPerformedCancelled(
-                ActionMaps.VRControllers,
-                VRControllersActions.Look,
-                OnLook,
-                register);
-            _inputDispatcher.ChangeRegistrationAll(
-                ActionMaps.VRControllers,
-                VRControllersActions.PushGripLeft,
-                OnGripLeft,
-                register);
-            _inputDispatcher.ChangeRegistrationAll(
-                ActionMaps.VRControllers,
-                VRControllersActions.PushGripRight,
-                OnGripRight,
-                register);
-            _inputDispatcher.ChangeRegistrationAll(
-                ActionMaps.VRControllers,
-                VRControllersActions.PushTriggerLeft,
-                OnTriggerLeft,
-                register);
-            _inputDispatcher.ChangeRegistrationAll(
-                ActionMaps.VRControllers,
-                VRControllersActions.PushTriggerRight,
-                OnTriggerRight,
-                register);
-
-            _inputDispatcher.ChangeRegistrationAll(
-                ActionMaps.VRTransform,
-                VRTransformActions.HeadPosition,
-                OnHmdMove,
-                register);
-            _inputDispatcher.ChangeRegistrationAll(
-                ActionMaps.VRTransform,
-                VRTransformActions.HeadRotation,
-                OnHmdRotate,
-                register);
+            _inputDispatcher.ChangeRegistrationStartCancelled(ActionMaps.VRControllers,
+                VRControllersActions.PushGripLeft, OnGripLeft, register);
+            _inputDispatcher.ChangeRegistrationStartCancelled(ActionMaps.VRControllers,
+                VRControllersActions.PushGripRight, OnGripRight, register);
+            _inputDispatcher.ChangeRegistrationStartCancelled(ActionMaps.VRControllers,
+                VRControllersActions.PushTriggerLeft, OnTriggerLeft, register);
+            _inputDispatcher.ChangeRegistrationStartCancelled(ActionMaps.VRControllers,
+                VRControllersActions.PushTriggerRight, OnTriggerRight, register);
         }
     }
 }

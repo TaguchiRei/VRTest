@@ -4,17 +4,20 @@ public class CameraMover : MonoBehaviour
 {
     [SerializeField] private Transform _target;
 
-    private Vector3 _offset;
+    private Vector3 _positionOffset;
+    private Quaternion _rotationOffset;
 
     private void Awake()
     {
-        _offset = Quaternion.Inverse(_target.rotation)
-                  * (transform.position - _target.position);
+        _positionOffset = Quaternion.Inverse(_target.rotation) * (transform.position - _target.position);
+
+        _rotationOffset = Quaternion.Inverse(_target.rotation) * transform.rotation;
     }
 
-    public void LateUpdate()
+    private void LateUpdate()
     {
-        transform.position = _target.position + _target.rotation * _offset;
-        transform.rotation = _target.rotation;
+        transform.position = _target.position + _target.rotation * _positionOffset;
+
+        transform.rotation = _target.rotation * _rotationOffset;
     }
 }
