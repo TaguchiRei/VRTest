@@ -1,0 +1,16 @@
+{
+    "name": "UnityUtility",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a2e759e845602164c860fc6e0391090c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
