@@ -43,31 +43,22 @@ namespace Domain
         {
             if (input.sqrMagnitude < 0.001f) return Vector3.zero;
 
-            // 1. カメラの向きに基づいた水平面上の基準軸を算出
-            // lookDirection は既に XZ 平面上の Vector2 (x, z)
+            // カメラの向きに基づいた水平面上の基準軸を算出
             Vector3 lookForward = new Vector3(lookDirection.x, 0, lookDirection.y).normalized;
-            Vector3 lookRight = new Vector3(lookDirection.y, 0, -lookDirection.x).normalized; // Forward(x,z) に対する Right(z,-x)
+            Vector3 lookRight = new Vector3(lookDirection.y, 0, -lookDirection.x).normalized;
 
-            // 2. 入力をカメラ基準の水平面上の方向に変換
+            // 入力をカメラ基準の水平面上の方向に変換
             Vector3 intendedDirection = (lookRight * input.x + lookForward * input.y);
 
-            // 3. 重力方向に基づいた接平面への投影
+            // 重力方向に基づいた接平面への投影
             Vector3 normalizedGravity = gravityDirection.normalized;
             
             // intendedDirection から重力方向の成分を取り除くことで接平面上のベクトルを得る
             Vector3 projectedVector = intendedDirection - Vector3.Dot(intendedDirection, normalizedGravity) * normalizedGravity;
 
-            // 4. ベクトルを正規化して元の入力強度を掛ける（斜面での減速を防ぐ）
+            // ベクトルを正規化して元の入力強度を掛ける（斜面での減速を防ぐ）
             if (projectedVector.sqrMagnitude < 0.001f) return Vector3.zero;
             return projectedVector.normalized * input.magnitude;
-        }
-
-        /// <summary>
-        /// 2次元の入力を、重力方向に直交する平面上の3次元移動ベクトルに変換する（互換用）
-        /// </summary>
-        public static Vector3 CalculateMoveVector(Vector2 input, Vector3 gravityDirection)
-        {
-            return CalculateMoveVector(input, gravityDirection, Vector2.up);
         }
 
         /// <summary>
@@ -99,7 +90,6 @@ namespace Domain
             float currentSpeedOnMoveDir = Vector3.Dot(currentVelocity, moveDir);
             
             // 自分が与えた移動パワーのうち、まだ速度として残っている分だけを取り除く
-            //（1.0与えて現在0.8なら0.8引く。1.2（加速中）なら1.0だけ引いて0.2残す）
             float speedToRemove = Mathf.Clamp(currentSpeedOnMoveDir, 0f, movePower.magnitude);
             
             return currentVelocity - (moveDir * speedToRemove);

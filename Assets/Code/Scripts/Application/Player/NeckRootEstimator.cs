@@ -13,15 +13,14 @@ public class NeckRootEstimator
         headForwardOffset: 0.08f,
         yawWeight: 0.35f,
         pitchWeight: 1.0f,
-        rollWeight: 0.65f,
-        torsoDownOffset: 0.12f
+        rollWeight: 0.65f
     );
 
     /// <summary>
     /// HMD回転・位置から首の根本の位置を推定する
     /// HMDの回転から、首に対するベクトルが分かるため、HMDの位置からそのベクトル分を引いた位置を首の位置としている
     /// </summary>
-    public (Vector3, Quaternion) EstimateNeckRootPosition(
+    public (Vector3, Quaternion) EstimateNeckRootTransform(
         Quaternion hmdRotation,
         Vector3 hmdPosition)
     {
@@ -78,11 +77,7 @@ public class NeckRootEstimator
             rollWeight: Mathf.Clamp(
                 source.RollWeight,
                 HmdSettings.MIN_WEIGHT,
-                HmdSettings.MAX_WEIGHT),
-            torsoDownOffset: Mathf.Clamp(
-                source.TorsoDownOffset,
-                HmdSettings.MIN_TORSO_DOWN,
-                HmdSettings.MAX_TORSO_DOWN)
+                HmdSettings.MAX_WEIGHT)
         );
     }
 
@@ -101,9 +96,7 @@ public class NeckRootEstimator
             settings.PitchWeight >= HmdSettings.MIN_WEIGHT &&
             settings.PitchWeight <= HmdSettings.MAX_WEIGHT &&
             settings.RollWeight >= HmdSettings.MIN_WEIGHT &&
-            settings.RollWeight <= HmdSettings.MAX_WEIGHT &&
-            settings.TorsoDownOffset >= HmdSettings.MIN_TORSO_DOWN &&
-            settings.TorsoDownOffset <= HmdSettings.MAX_TORSO_DOWN;
+            settings.RollWeight <= HmdSettings.MAX_WEIGHT;
     }
 
     /// <summary>

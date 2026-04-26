@@ -33,7 +33,7 @@ public readonly struct HmdSettings
     public const float MAX_TORSO_DOWN = 0.50f;
 
     #endregion
-
+    
 
     /// <summary>首から頭中心までの高さ(m)</summary>
     public readonly float NeckHeight;
@@ -49,18 +49,13 @@ public readonly struct HmdSettings
 
     /// <summary>Roll反映率(0～1)</summary>
     public readonly float RollWeight;
-
-    /// <summary>胴体を頭より何m下に置くか</summary>
-    public readonly float TorsoDownOffset;
-
-    public HmdSettings(float neckHeight, float headForwardOffset, float yawWeight, float pitchWeight, float rollWeight,
-        float torsoDownOffset)
+    
+    public HmdSettings(float neckHeight, float headForwardOffset, float yawWeight, float pitchWeight, float rollWeight)
     {
         NeckHeight = neckHeight;
         HeadForwardOffset = headForwardOffset;
         YawWeight = yawWeight;
         PitchWeight = pitchWeight;
         RollWeight = rollWeight;
-        TorsoDownOffset = torsoDownOffset;
     }
 }
