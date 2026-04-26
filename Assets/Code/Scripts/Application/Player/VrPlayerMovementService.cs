@@ -11,11 +11,42 @@ namespace Application
     {
         private readonly IVrMovementView _view;
         private readonly PlayerMovementEntity _entity;
+        private readonly NeckRootEstimator _neckRootEstimator;
 
-        public VrPlayerMovementService(IVrMovementView view, PlayerMovementEntity entity)
+        public VrPlayerMovementService(
+            IVrMovementView view, PlayerMovementEntity entity, NeckRootEstimator neckRootEstimator)
         {
             _view = view;
             _entity = entity;
+            _neckRootEstimator = neckRootEstimator;
+        }
+
+        public void OnHmdUpdate(Vector3 position, Quaternion hmdRotation, Quaternion bodyRotation)
+        {
+            var neckTransform = _neckRootEstimator.EstimateNeckRootTransform(
+                hmdRotation, position, bodyRotation);
+
+            _view.OnHmdUpdate(neckTransform);
+
+            // NeckTransformの回転（clampedYaw適用済み）でLookDirectionを更新
+            // これによりBodyのexcessYaw回転との不連続がなくなる
+            UpdateLookDirection(neckTransform.NeckRotation);
+        }
+
+        /// <summary>
+        /// 視線の向きを更新する
+        /// NeckTransformの回転（制限済み）から移動方向を決定する
+        /// </summary>
+        private void UpdateLookDirection(Quaternion neckRotation)
+        {
+            Vector3 forward = neckRotation * Vector3.forward;
+            Vector2 horizontalDirection = new Vector2(forward.x, forward.z);
+
+            horizontalDirection = horizontalDirection.sqrMagnitude > 0f
+                ? horizontalDirection.normalized
+                : Vector2.up;
+
+            _entity.UpdateLookDirection(horizontalDirection);
         }
 
         /// <summary>
@@ -32,7 +63,7 @@ namespace Application
                 _entity.LastMovePower.Value
             );
 
-            // 新しい移動ベクトルを計算（視線の向きを考慮）
+            // 新しい移動ベクトルを計算
             Vector3 newMoveVector = MovementLogic.CalculateMoveVector(
                 input,
                 _entity.Gravity.Direction,
@@ -54,14 +85,6 @@ namespace Application
         {
             _view.UpdateLeftHand(leftHandPosition, leftHandRotation);
             _view.UpdateRightHand(rightHandPosition, rightHandRotation);
-        }
-
-        /// <summary>
-        /// 視線の向きを更新する
-        /// </summary>
-        public void UpdateLookDirection(Vector2 direction)
-        {
-            _entity.UpdateLookDirection(direction);
         }
 
         /// <summary>

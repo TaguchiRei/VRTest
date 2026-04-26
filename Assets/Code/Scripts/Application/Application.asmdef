@@ -2,7 +2,8 @@
     "name": "Application",
     "rootNamespace": "",
     "references": [
-        "Domain"
+        "Domain",
+        "Utility"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -9,6 +9,7 @@ namespace Application
     {
         Vector3 Velocity { get; set; }
         void AddForce(Vector3 force, ForceMode mode);
+        void OnHmdUpdate(NeckTransform neckTransform);
         void UpdateLeftHand(Vector3 position, Quaternion rotation);
         void UpdateRightHand(Vector3 position, Quaternion rotation);
     }
