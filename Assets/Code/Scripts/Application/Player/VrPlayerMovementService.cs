@@ -11,11 +11,20 @@ namespace Application
     {
         private readonly IVrMovementView _view;
         private readonly PlayerMovementEntity _entity;
+        private readonly NeckRootEstimator _neckRootEstimator;
 
-        public VrPlayerMovementService(IVrMovementView view, PlayerMovementEntity entity)
+        public VrPlayerMovementService(
+            IVrMovementView view, PlayerMovementEntity entity, NeckRootEstimator neckRootEstimator)
         {
             _view = view;
             _entity = entity;
+            _neckRootEstimator = neckRootEstimator;
+        }
+
+        public void OnHmdUpdate(Vector3 position, Quaternion rotation)
+        {
+            var neckTransform = _neckRootEstimator.EstimateNeckRootTransform(rotation, position);
+            _view.OnHmdRotate(neckTransform);
         }
 
         /// <summary>
