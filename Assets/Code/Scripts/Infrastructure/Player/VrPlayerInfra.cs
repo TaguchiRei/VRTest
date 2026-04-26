@@ -118,6 +118,8 @@ namespace Code.Scripts.Infrastructure.Player
                 ActionMaps.VRTransform, VRTransformActions.HeadRotation);
             if (hmdRotCtx.IsActive)
                 Debug.Log($"{hmdRotCtx.Value} HMD Rotation");
+
+            _vrPlayerMovementService.OnHmdUpdate(hmdPosCtx.Value, hmdRotCtx.Value);
         }
 
         private void ChangeRegistration(bool register = true)
