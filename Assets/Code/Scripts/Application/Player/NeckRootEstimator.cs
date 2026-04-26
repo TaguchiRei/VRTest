@@ -13,9 +13,9 @@ public class NeckRootEstimator
     public HmdSettings HmdSettings = new(
         neckHeight: 0.18f,
         headForwardOffset: 0.08f,
-        yawWeight: 0.35f,
-        pitchWeight: 1.0f,
-        rollWeight: 0.65f,
+        yawWeight: 1f,
+        pitchWeight: 1f,
+        rollWeight: 1f,
         neckYawLimit: 70f
     );
 
@@ -25,55 +25,35 @@ public class NeckRootEstimator
     /// </summary>
     public NeckTransform EstimateNeckRootTransform(
         Quaternion hmdRotation,
-        Vector3 hmdPosition)
+        Vector3 hmdPosition,
+        Quaternion bodyRotation)
     {
-        // Euler角を-180～180の範囲に強制して取得
-        Vector3 euler = NormalizeEuler(hmdRotation.eulerAngles);
+        // HMD回転をBody空間へ変換（相対回転）
+        // bodyRotation.inverse * hmdRotation = "Bodyから見たHMDの向き"
+        Quaternion relativeRotation = Quaternion.Inverse(bodyRotation) * hmdRotation;
 
-        // 上半身などの動きまで首で行わないように補正を掛ける
+        Vector3 euler = NormalizeEuler(relativeRotation.eulerAngles);
+
         float yaw = euler.y * HmdSettings.YawWeight;
         float pitch = euler.x * HmdSettings.PitchWeight;
         float roll = euler.z * HmdSettings.RollWeight;
 
-        Quaternion rawRotation = Quaternion.Euler(pitch, yaw, roll);
-
-        if (Quaternion.Dot(_prevNeckRotation, rawRotation) < 0f)
-        {
-            rawRotation = new Quaternion(
-                -rawRotation.x,
-                -rawRotation.y,
-                -rawRotation.z,
-                -rawRotation.w
-            );
-        }
-
-        // 最短経路で補完する
-        Quaternion weightedRotation = Quaternion.Slerp(
-            _prevNeckRotation,
-            rawRotation,
-            1f
-        );
-
-        // 首 → 頭中心ベクトル
-        Vector3 neckToHead = new Vector3(
-            0f,
-            HmdSettings.NeckHeight,
-            HmdSettings.HeadForwardOffset);
-
-        // 回転後オフセット
-        Vector3 rotatedOffset = weightedRotation * neckToHead;
-
-        // 頭位置から首位置逆算
-        Vector3 neckPosition = hmdPosition - rotatedOffset;
-
-        // 現在のyawを制限
+        // 首Yaw制限（Body相対なので±70°が自然な可動域）
         float clampedYaw = Mathf.Clamp(yaw, -HmdSettings.NeckYawLimit, HmdSettings.NeckYawLimit);
 
-        // 首回転を再構築
-        Quaternion neckRotation = Quaternion.Euler(pitch, clampedYaw, roll);
+        Quaternion neckRotationLocal = Quaternion.Euler(pitch, clampedYaw, roll);
 
-        //Y軸回転のうち制限超過分をfloat値として送る(Degree)
-        return new NeckTransform(neckPosition, neckRotation, yaw - clampedYaw);
+        // ワールド空間へ戻す
+        Quaternion neckRotationWorld = bodyRotation * neckRotationLocal;
+
+        // 首→頭オフセットをワールド空間で計算
+        Vector3 neckToHead = new Vector3(0f, HmdSettings.NeckHeight, HmdSettings.HeadForwardOffset);
+        Vector3 rotatedOffset = neckRotationWorld * neckToHead;
+        Vector3 neckPosition = hmdPosition - rotatedOffset;
+
+        float excessYaw = (yaw - clampedYaw); // Body相対での超過分
+
+        return new NeckTransform(neckPosition, neckRotationWorld, excessYaw);
     }
 
     /// <summary>

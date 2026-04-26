@@ -1568,9 +1568,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerView
   InitializationOrder: 0
   _rigidbody: {fileID: 1335860914}
-  _cameraTransform: {fileID: 1585112573}
   _leftHandTransform: {fileID: 686905652}
   _rightHandTransform: {fileID: 1676407095}
+  _modelRoot: {fileID: 1815095887}
+  _neckBone: {fileID: 1815095939}
 --- !u!114 &1335860916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1585,6 +1586,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Controller::PlayerController
   InitializationOrder: 0
   _cameraTransform: {fileID: 1585112573}
+  _bodyRoot: {fileID: 1815095887}
 --- !u!114 &1335860917
 MonoBehaviour:
   m_ObjectHideFlags: 0

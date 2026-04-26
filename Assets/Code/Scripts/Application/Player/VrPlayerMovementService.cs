@@ -21,10 +21,32 @@ namespace Application
             _neckRootEstimator = neckRootEstimator;
         }
 
-        public void OnHmdUpdate(Vector3 position, Quaternion rotation)
+        public void OnHmdUpdate(Vector3 position, Quaternion hmdRotation, Quaternion bodyRotation)
         {
-            var neckTransform = _neckRootEstimator.EstimateNeckRootTransform(rotation, position);
-            _view.OnHmdRotate(neckTransform);
+            var neckTransform = _neckRootEstimator.EstimateNeckRootTransform(
+                hmdRotation, position, bodyRotation);
+
+            _view.OnHmdUpdate(neckTransform);
+
+            // NeckTransformの回転（clampedYaw適用済み）でLookDirectionを更新
+            // これによりBodyのexcessYaw回転との不連続がなくなる
+            UpdateLookDirection(neckTransform.NeckRotation);
+        }
+
+        /// <summary>
+        /// 視線の向きを更新する
+        /// NeckTransformの回転（制限済み）から移動方向を決定する
+        /// </summary>
+        private void UpdateLookDirection(Quaternion neckRotation)
+        {
+            Vector3 forward = neckRotation * Vector3.forward;
+            Vector2 horizontalDirection = new Vector2(forward.x, forward.z);
+
+            horizontalDirection = horizontalDirection.sqrMagnitude > 0f
+                ? horizontalDirection.normalized
+                : Vector2.up;
+
+            _entity.UpdateLookDirection(horizontalDirection);
         }
 
         /// <summary>
@@ -63,14 +85,6 @@ namespace Application
         {
             _view.UpdateLeftHand(leftHandPosition, leftHandRotation);
             _view.UpdateRightHand(rightHandPosition, rightHandRotation);
-        }
-
-        /// <summary>
-        /// 視線の向きを更新する
-        /// </summary>
-        public void UpdateLookDirection(Vector2 direction)
-        {
-            _entity.UpdateLookDirection(direction);
         }
 
         /// <summary>

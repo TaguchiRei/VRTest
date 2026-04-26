@@ -12,12 +12,12 @@ public class PlayerInitializer : MonoBehaviour
     [SerializeField] private float _gravityPower;
     [SerializeField] private Vector3 _gravityVector;
 
-    [SerializeField] private HmdSettings _hmdSettings = new(
+    private HmdSettings _hmdSettings = new(
         neckHeight: 0.18f,
         headForwardOffset: 0.08f,
-        yawWeight: 0.35f,
-        pitchWeight: 1.0f,
-        rollWeight: 0.65f,
+        yawWeight: 1f,
+        pitchWeight: 1f,
+        rollWeight: 1f,
         neckYawLimit: 70f
     );
 

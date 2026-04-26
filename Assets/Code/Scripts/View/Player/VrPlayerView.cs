@@ -10,6 +10,8 @@ public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
     [SerializeField] private Transform _modelRoot;
     [SerializeField] private Transform _neckBone;
 
+    private float _bodyYawAccumulated;
+
     public Vector3 Velocity
     {
         get => _rigidbody.linearVelocity;
@@ -20,6 +22,7 @@ public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
     {
         base.Initialize();
         _rigidbody.useGravity = false;
+        _bodyYawAccumulated = _modelRoot.eulerAngles.y; // 初期値をワールドYawで設定
     }
 
     public void AddForce(Vector3 force, ForceMode mode)
@@ -27,17 +30,15 @@ public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
         _rigidbody.AddForce(force, mode);
     }
 
-    public void OnHmdRotate(NeckTransform neckTransform)
+    public void OnHmdUpdate(NeckTransform neckTransform)
     {
-        _neckBone.position = neckTransform.NeckPosition;
+        // NeckRotationはワールド回転なのでそのまま適用
         _neckBone.rotation = neckTransform.NeckRotation;
 
-        Vector3 currentEuler = _modelRoot.rotation.eulerAngles;
-        float bodyYaw = neckTransform.BodyRotationY;
+        // 累積値に差分を加算（eulerAngles不連続問題を回避）
+        _bodyYawAccumulated += neckTransform.BodyRotationY;
 
-        float newYaw = currentEuler.y + bodyYaw;
-
-        _modelRoot.rotation = Quaternion.Euler(currentEuler.x, newYaw, currentEuler.z);
+        _modelRoot.rotation = Quaternion.Euler(0f, _bodyYawAccumulated, 0f);
     }
 
     public void UpdateLeftHand(Vector3 position, Quaternion rotation)
