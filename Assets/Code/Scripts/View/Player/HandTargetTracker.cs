@@ -2,14 +2,21 @@ using UnityEngine;
 
 public class HandTargetTracker : MonoBehaviour
 {
-    [SerializeField] private Transform _tracker;
+    [Header("XR Tracker")] [SerializeField]
+    private Transform _tracker;
 
-    /// <summary>
-    /// Animationの更新より後に動かす
-    /// </summary>
-    private void LateUpdate()
+    [Header("Offset")] [SerializeField] private Vector3 _positionOffset;
+    [SerializeField] private Vector3 _rotationOffsetEuler;
+
+    void LateUpdate()
     {
-        transform.position = _tracker.position;
-        transform.rotation = _tracker.rotation;
+        if (_tracker == null) return;
+
+        transform.position =
+            _tracker.TransformPoint(_positionOffset);
+
+        transform.rotation =
+            _tracker.rotation *
+            Quaternion.Euler(_rotationOffsetEuler);
     }
 }
