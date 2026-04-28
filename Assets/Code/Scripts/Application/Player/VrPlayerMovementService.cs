@@ -11,26 +11,12 @@ namespace Application
     {
         private readonly IVrMovementView _view;
         private readonly PlayerMovementEntity _entity;
-        private readonly NeckRootEstimator _neckRootEstimator;
 
         public VrPlayerMovementService(
-            IVrMovementView view, PlayerMovementEntity entity, NeckRootEstimator neckRootEstimator)
+            IVrMovementView view, PlayerMovementEntity entity)
         {
             _view = view;
             _entity = entity;
-            _neckRootEstimator = neckRootEstimator;
-        }
-
-        public void OnHmdUpdate(Vector3 position, Quaternion hmdRotation, Quaternion bodyRotation)
-        {
-            var neckTransform = _neckRootEstimator.EstimateNeckRootTransform(
-                hmdRotation, position, bodyRotation);
-
-            _view.OnHmdUpdate(neckTransform);
-
-            // NeckTransformの回転（clampedYaw適用済み）でLookDirectionを更新
-            // これによりBodyのexcessYaw回転との不連続がなくなる
-            UpdateLookDirection(neckTransform.NeckRotation);
         }
 
         /// <summary>
@@ -75,16 +61,6 @@ namespace Application
 
             // Viewに反映
             _view.Velocity = velocityWithoutLastMove + newMoveVector;
-        }
-
-        public void UpdateHandPosition(
-            Vector3 leftHandPosition,
-            Vector3 rightHandPosition,
-            Quaternion leftHandRotation,
-            Quaternion rightHandRotation)
-        {
-            _view.UpdateLeftHand(leftHandPosition, leftHandRotation);
-            _view.UpdateRightHand(rightHandPosition, rightHandRotation);
         }
 
         /// <summary>

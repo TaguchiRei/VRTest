@@ -12,31 +12,17 @@ public class PlayerInitializer : MonoBehaviour
     [SerializeField] private float _gravityPower;
     [SerializeField] private Vector3 _gravityVector;
 
-    private HmdSettings _hmdSettings = new(
-        neckHeight: 0.18f,
-        headForwardOffset: 0.08f,
-        yawWeight: 1f,
-        pitchWeight: 1f,
-        rollWeight: 1f,
-        neckYawLimit: 70f
-    );
-
     public void Initialize(InputDispatcher inputDispatcher)
     {
         vrPlayerView.Initialize();
         var gravity = new GravityValue(_gravityVector, _gravityPower);
         var moveSpeed = new MoveSpeed(_moveSpeed);
         var playerMovementEntity = new PlayerMovementEntity(gravity, moveSpeed);
-        var estimator = new NeckRootEstimator
-        {
-            HmdSettings = _hmdSettings
-        };
 
         vrPlayerInfra.Inject(inputDispatcher,
             new VrPlayerMovementService(
                 vrPlayerView,
-                playerMovementEntity,
-                estimator
+                playerMovementEntity
             )
         );
         vrPlayerInfra.Initialize();

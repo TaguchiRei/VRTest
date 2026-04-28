@@ -44,16 +44,6 @@ namespace Code.Scripts.Infrastructure.Player
             ChangeRegistration(false);
         }
 
-        public void OnHmdMove(InputAction.CallbackContext context)
-        {
-            
-        }
-
-        public void OnHmdRotate(InputAction.CallbackContext context)
-        {
-            
-        }
-
         public void OnGripLeft(InputAction.CallbackContext context)
         {
             Debug.Log("GripLeft");
@@ -98,7 +88,7 @@ namespace Code.Scripts.Infrastructure.Player
             _vrPlayerMovementService.Move(_moveInputValue);
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!Initialized) return;
 
@@ -108,13 +98,17 @@ namespace Code.Scripts.Infrastructure.Player
             var hmdRotCtx = _inputDispatcher.ReadValue<Quaternion, VRTransformActions>(
                 ActionMaps.VRTransform, VRTransformActions.HeadRotation);
 
+            var leftControllerPos = _inputDispatcher.ReadValue<Vector3, VRTransformActions>(
+                ActionMaps.VRTransform, VRTransformActions.LeftHandPosition);
+            var rightControllerPos = _inputDispatcher.ReadValue<Vector3, VRTransformActions>(
+                ActionMaps.VRTransform, VRTransformActions.RightHandPosition);
+            var leftControllerRot = _inputDispatcher.ReadValue<Quaternion, VRTransformActions>(
+                ActionMaps.VRTransform, VRTransformActions.LeftHandRotation);
+            var rightControllerRot = _inputDispatcher.ReadValue<Quaternion, VRTransformActions>(
+                ActionMaps.VRTransform, VRTransformActions.RightHandRotation);
+
             if (!hmdRotCtx.IsActive) return;
-
-            // bodyRotationをInfraから取得
-            Quaternion bodyRotation = _bodyRoot.rotation;
-
-            // LookDirectionの更新にbodyRotationを渡す
-            _vrPlayerMovementService.OnHmdUpdate(hmdPosCtx.Value, hmdRotCtx.Value, bodyRotation);
+            
         }
 
         private void ChangeRegistration(bool register = true)
