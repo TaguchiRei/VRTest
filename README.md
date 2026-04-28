@@ -33,3 +33,8 @@
 
 5.**XR Interaction Toolkitをインストール **
    -　**Package Manager → XR Interaction Toolkit**を探してインストール
+
+# 開発メモ
+## XRの不具合について
+   - XRとMetaQuestを使った際、InputSystemからスティック入力の受付などをしようとしたときに、定期的あるいは不定期にcancelledイベントとともにVector2.zeroの入力が呼ばれることがあり、それが原因で移動などが安定しないことがある。
+   - その為、移動などを自前で実装したい場合は自力でイベントを読む必要がある。
