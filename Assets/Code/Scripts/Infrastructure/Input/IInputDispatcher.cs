@@ -1,6 +1,5 @@
 using System;
 using UnityEngine.InputSystem;
-using UsefulTools.AutoGenerate;
 
 public interface IInputDispatcher
 {

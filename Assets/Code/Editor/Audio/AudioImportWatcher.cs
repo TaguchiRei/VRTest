@@ -25,13 +25,37 @@ public class AudioImportWatcher : AssetPostprocessor
 
         if (audioPaths.Count > 0)
         {
-            // インポートされたファイルをキューに渡してウィンドウを表示
-            AudioImportTab.ShowWindow(audioPaths);
+            // 名前が英語・数字・_以外を含む、または重複しているものだけを抽出
+            var filteredPaths = audioPaths.Where(path => IsInvalidName(path) || IsDuplicate(path)).ToList();
+            
+            if (filteredPaths.Count > 0)
+            {
+                // インポートされたファイルをキューに渡してウィンドウを表示
+                AudioImportTab.ShowWindow(filteredPaths);
+            }
         }
 
         // 処理済みリストから今回移動・追加されたものを消す（次回の通常インポートに備える）
         foreach (var path in importedAssets) _processingPaths.Remove(path);
         foreach (var path in movedAssets) _processingPaths.Remove(path);
+    }
+
+    private static bool IsInvalidName(string path)
+    {
+        string name = System.IO.Path.GetFileNameWithoutExtension(path);
+        return !System.Text.RegularExpressions.Regex.IsMatch(name, @"^[a-zA-Z0-9_]+$");
+    }
+
+    private static bool IsDuplicate(string path)
+    {
+        string nameWithExt = System.IO.Path.GetFileName(path);
+        string bgmPath = (AudioSupportTool.BGMFolder.EndsWith("/") ? AudioSupportTool.BGMFolder : AudioSupportTool.BGMFolder + "/") + nameWithExt;
+        string sePath = (AudioSupportTool.SEFolder.EndsWith("/") ? AudioSupportTool.SEFolder : AudioSupportTool.SEFolder + "/") + nameWithExt;
+        
+        // 元のパスと違う場合に重複チェック（無限ループ防止）
+        if (path == bgmPath || path == sePath) return false;
+
+        return AssetDatabase.LoadAssetAtPath<Object>(bgmPath) != null || AssetDatabase.LoadAssetAtPath<Object>(sePath) != null;
     }
 
     public static void MarkAsProcessing(string path)

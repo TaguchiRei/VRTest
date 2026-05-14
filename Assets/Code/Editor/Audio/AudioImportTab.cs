@@ -97,29 +97,60 @@ public class AudioImportTab : EditorWindow
 
                     current.NewName = EditorGUILayout.TextField("New File Name", current.NewName);
                     
-                    // 日本語が含まれている場合の警告表示
-                    if (HasJapanese(current.NewName))
+                    bool invalid = IsInvalidName(current.NewName);
+                    if (invalid)
                     {
-                        EditorGUILayout.HelpBox("日本語のファイル名は許可されていません。適用すると削除されます。", MessageType.Error);
+                        EditorGUILayout.HelpBox("英語・数字・_ 以外の文字が含まれています。適用してもフォルダ分けされません。", MessageType.Warning);
                     }
 
                     current.Category = (AudioCategory)EditorGUILayout.EnumPopup("Category", current.Category);
-                }
 
-                EditorGUILayout.Space();
+                    // 重複チェック
+                    string targetFolder = (current.Category == AudioCategory.BGM) ? AudioSupportTool.BGMFolder : AudioSupportTool.SEFolder;
+                    string extension = Path.GetExtension(current.Path);
+                    string targetPath = (targetFolder.EndsWith("/") ? targetFolder : targetFolder + "/") + current.NewName + extension;
+                    bool exists = AssetDatabase.LoadAssetAtPath<Object>(targetPath) != null && current.Path != targetPath;
 
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Apply & Next", GUILayout.Height(40)))
+                    if (exists)
                     {
-                        if (ApplyCurrent()) _currentIndex++;
-                        if (_currentIndex >= _items.Count) FinalizeImport();
+                        EditorGUILayout.HelpBox("同名のファイルが既に存在します。", MessageType.Error);
                     }
 
-                    if (GUILayout.Button("Skip", GUILayout.Height(40)))
+                    EditorGUILayout.Space();
+
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        _currentIndex++;
-                        if (_currentIndex >= _items.Count) FinalizeImport();
+                        if (exists)
+                        {
+                            if (GUILayout.Button("Overwrite", GUILayout.Height(30)))
+                            {
+                                if (ApplyCurrent(true)) _currentIndex++;
+                                if (_currentIndex >= _items.Count) FinalizeImport();
+                            }
+                            if (GUILayout.Button("Rename (Unique)", GUILayout.Height(30)))
+                            {
+                                if (ApplyCurrent(false)) _currentIndex++;
+                                if (_currentIndex >= _items.Count) FinalizeImport();
+                            }
+                        }
+                        else
+                        {
+                            if (GUILayout.Button("Apply & Next", GUILayout.Height(30)))
+                            {
+                                if (ApplyCurrent(false)) _currentIndex++;
+                                if (_currentIndex >= _items.Count) FinalizeImport();
+                            }
+                        }
+
+                        if (GUILayout.Button("Cancel / Delete", GUILayout.Height(30)))
+                        {
+                            if (EditorUtility.DisplayDialog("Confirm", "このアセットを削除してインポートをキャンセルしますか？", "Delete", "Skip"))
+                            {
+                                AssetDatabase.DeleteAsset(current.Path);
+                            }
+                            _currentIndex++;
+                            if (_currentIndex >= _items.Count) FinalizeImport();
+                        }
                     }
                 }
                 
@@ -127,7 +158,7 @@ public class AudioImportTab : EditorWindow
                 
                 if (GUILayout.Button("Apply All Remaining"))
                 {
-                    if (EditorUtility.DisplayDialog("Confirm", "残りの全ファイルをインポートしますか？（日本語ファイル名は削除されます）", "Yes", "No"))
+                    if (EditorUtility.DisplayDialog("Confirm", "残りの全ファイルをインポートしますか？（不正な名前のファイルは移動されません。重複はユニーク名にリネームされます）", "Yes", "No"))
                     {
                         ApplyAllRemaining();
                     }
@@ -136,15 +167,14 @@ public class AudioImportTab : EditorWindow
         }
     }
 
-    private bool ApplyCurrent()
+    private bool ApplyCurrent(bool overwrite = false)
     {
         var current = _items[_currentIndex];
         
-        // 日本語が含まれている場合は削除してスキップ
-        if (HasJapanese(current.NewName))
+        // 英語・数字・_ 以外が含まれている場合は移動させない
+        if (IsInvalidName(current.NewName))
         {
-            Debug.LogError($"[UsefulTools] Japanese characters detected in New Name: {current.NewName}. Deleting asset.");
-            AssetDatabase.DeleteAsset(current.Path);
+            Debug.LogWarning($"[UsefulTools] Invalid name '{current.NewName}' contains characters other than Alphanumeric or Underscore. Skipping folder organization.");
             return true;
         }
 
@@ -152,10 +182,10 @@ public class AudioImportTab : EditorWindow
         EnsureFolderExists(targetFolder);
         AssetDatabase.Refresh();
 
-        return MoveAsset(current, targetFolder);
+        return MoveAsset(current, targetFolder, overwrite);
     }
 
-    private bool MoveAsset(ImportItem item, string targetFolder)
+    private bool MoveAsset(ImportItem item, string targetFolder, bool overwrite)
     {
         string extension = Path.GetExtension(item.Path);
         string newPath = (targetFolder.EndsWith("/") ? targetFolder : targetFolder + "/") + item.NewName + extension;
@@ -165,7 +195,14 @@ public class AudioImportTab : EditorWindow
 
         if (AssetDatabase.LoadAssetAtPath<Object>(newPath) != null)
         {
-            newPath = AssetDatabase.GenerateUniqueAssetPath(newPath);
+            if (overwrite)
+            {
+                AssetDatabase.DeleteAsset(newPath);
+            }
+            else
+            {
+                newPath = AssetDatabase.GenerateUniqueAssetPath(newPath);
+            }
         }
 
         AudioImportWatcher.MarkAsProcessing(newPath);
@@ -216,7 +253,7 @@ public class AudioImportTab : EditorWindow
             for (int i = _currentIndex; i < _items.Count; i++)
             {
                 _currentIndex = i;
-                ApplyCurrent();
+                ApplyCurrent(false);
             }
         }
         finally
@@ -237,9 +274,9 @@ public class AudioImportTab : EditorWindow
         Close();
     }
 
-    private bool HasJapanese(string text)
+    private bool IsInvalidName(string text)
     {
-        if (string.IsNullOrEmpty(text)) return false;
-        return System.Text.RegularExpressions.Regex.IsMatch(text, @"[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]");
+        if (string.IsNullOrEmpty(text)) return true;
+        return !System.Text.RegularExpressions.Regex.IsMatch(text, @"^[a-zA-Z0-9_]+$");
     }
 }

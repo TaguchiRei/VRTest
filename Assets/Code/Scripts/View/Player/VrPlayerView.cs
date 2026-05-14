@@ -1,38 +1,75 @@
-using System;
-using Application;
+using Presentation;
 using UnityEngine;
 
-public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
+namespace UsefulVr.View.Runtime.Player
 {
-    [SerializeField] private Rigidbody _rigidbody;
-
-    private float _bodyYawAccumulated;
-
-    public Vector3 Velocity
+    public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
     {
-        get => _rigidbody.linearVelocity;
-        set => _rigidbody.linearVelocity = value;
-    }
+        [Header("Physics")]
+        [SerializeField] private Rigidbody _rigidbody;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-        _rigidbody.useGravity = false;
-    }
+        [Header("XR References")]
+        [SerializeField] private Transform _xrOrigin;
+        [SerializeField] private Transform _cameraOffset;
+        [SerializeField] private Transform _mainCamera;
 
-    public void AddForce(Vector3 force, ForceMode mode)
-    {
-        if (!Initialized) return;
-        _rigidbody.AddForce(force, mode);
-    }
+        private float _bodyYawAccumulated;
 
-    public void UpdateLeftHand(Vector3 position, Quaternion rotation)
-    {
-        if (!Initialized) return;
-    }
+        public Vector3 Velocity
+        {
+            get => _rigidbody.linearVelocity;
+            set => _rigidbody.linearVelocity = value;
+        }
 
-    public void UpdateRightHand(Vector3 position, Quaternion rotation)
-    {
-        if (!Initialized) return;
+        /// <summary>
+        /// PlayerRootのワールド座標
+        /// </summary>
+        public Vector3 ColliderPosition => _rigidbody.position;
+
+        /// <summary>
+        /// Main Cameraのワールド座標
+        /// </summary>
+        public Vector3 CameraPosition => _mainCamera.position;
+
+        /// <summary>
+        /// Main CameraのPlayerRoot基準ローカル座標
+        /// </summary>
+        public Vector3 CameraLocalPosition => _mainCamera.localPosition;
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            _rigidbody.useGravity = false;
+        }
+
+        public void AddForce(Vector3 force, ForceMode mode)
+        {
+            if (!Initialized) return;
+
+            _rigidbody.AddForce(force, mode);
+        }
+
+        public void ApplyPositionOffset(Vector3 offset)
+        {
+            if (!Initialized) return;
+
+            // PlayerRoot を移動
+            _rigidbody.MovePosition(
+                _rigidbody.position + offset);
+
+            // 視点維持のため CameraOffset を逆方向へ補正
+            _cameraOffset.localPosition -= offset;
+        }
+
+        public void UpdateLeftHand(Vector3 position, Quaternion rotation)
+        {
+            if (!Initialized) return;
+        }
+
+        public void UpdateRightHand(Vector3 position, Quaternion rotation)
+        {
+            if (!Initialized) return;
+        }
     }
 }

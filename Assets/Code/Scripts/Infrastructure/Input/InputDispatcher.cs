@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UsefulTools.AutoGenerate;
 
 public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
 {

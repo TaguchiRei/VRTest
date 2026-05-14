@@ -6,6 +6,7 @@ public enum InListSceneName
 
 public enum OutListSceneName
 {
+    ShaderTestScene,
     VRTestScene,
     Human_Basic_Motions___Unity_Demo_Scene,
 }

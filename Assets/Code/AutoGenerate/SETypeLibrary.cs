@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UsefulTools.AutoGenerate
+namespace UsefulTOols.AutoGenerate
 {
     [CreateAssetMenu(fileName = "SETypeLibrary", menuName = "UsefulTools/Audio/SETypeLibrary")]
     public class SETypeLibrary : ScriptableObject

@@ -9,13 +9,13 @@ namespace Application
     /// </summary>
     public class VrPlayerMovementService
     {
-        private readonly IVrMovementView _view;
+        private readonly IPlayerPresenter _playerPresenter;
         private readonly PlayerMovementEntity _entity;
 
         public VrPlayerMovementService(
-            IVrMovementView view, PlayerMovementEntity entity)
+            IPlayerPresenter playerPresenter, PlayerMovementEntity entity)
         {
-            _view = view;
+            _playerPresenter = playerPresenter;
             _entity = entity;
         }
 
@@ -41,7 +41,7 @@ namespace Application
         public void Move(Vector2 input)
         {
             // 現在の速度
-            Vector3 currentVelocity = _view.Velocity;
+            Vector3 currentVelocity = _playerPresenter.Velocity;
 
             // 前回の移動成分を取り除いた速度を計算
             Vector3 velocityWithoutLastMove = MovementLogic.CalculateVelocityAfterStop(
@@ -60,7 +60,7 @@ namespace Application
             _entity.UpdateMovePower(newMoveVector);
 
             // Viewに反映
-            _view.Velocity = velocityWithoutLastMove + newMoveVector;
+            _playerPresenter.Velocity = velocityWithoutLastMove + newMoveVector;
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Application
         /// </summary>
         public void ApplyGravity()
         {
-            _view.AddForce(_entity.Gravity.GravityForce, ForceMode.Acceleration);
+            _playerPresenter.AddForce(_entity.Gravity.GravityForce, ForceMode.Acceleration);
         }
     }
 }

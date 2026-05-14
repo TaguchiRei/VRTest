@@ -3,7 +3,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace ScriptedTalk
+namespace UsefulAttribute
 {
     public class ShowOnlyAttribute : PropertyAttribute
     {

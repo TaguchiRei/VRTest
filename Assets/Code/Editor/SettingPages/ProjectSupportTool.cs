@@ -44,6 +44,9 @@ namespace UsefulTools.Editor
         public static string VContainerUrl { get => EditorPrefs.GetString(VContainerUrlKey, DefaultVContainerUrl); set => EditorPrefs.SetString(VContainerUrlKey, value); }
         public static string AddressablesPkg { get => EditorPrefs.GetString(AddressablesPkgKey, DefaultAddressablesPkg); set => EditorPrefs.SetString(AddressablesPkgKey, value); }
 
+        private const string ArchDefGuidKey = "UsefulTools.Code.ArchDefGuid";
+        private ArchitectureDefinition _archDefinition;
+
         private static AddRequest _request;
 
         // --- Hierarchy Fields ---
@@ -62,11 +65,23 @@ namespace UsefulTools.Editor
             RefreshIntendedStructure();
             LoadGitIgnore();
             ScanCurrentStructure();
+
+            // Load Architecture Definition
+            string guid = EditorPrefs.GetString(ArchDefGuidKey, "");
+            if (!string.IsNullOrEmpty(guid))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _archDefinition = AssetDatabase.LoadAssetAtPath<ArchitectureDefinition>(path);
+                }
+            }
         }
 
         private void RefreshIntendedStructure()
         {
             _intendedStructure = new List<DirectoryHierarchy>();
+            
             var art = new DirectoryHierarchy("Art", "Assets/Art");
             art.children.Add(new DirectoryHierarchy("Materials", "Assets/Art/Materials"));
             art.children.Add(new DirectoryHierarchy("Models", "Assets/Art/Models"));
@@ -76,11 +91,19 @@ namespace UsefulTools.Editor
             code.children.Add(new DirectoryHierarchy("Scripts", "Assets/Code/Scripts"));
             code.children.Add(new DirectoryHierarchy("Editor", "Assets/Code/Editor"));
 
+            var data = new DirectoryHierarchy("Data", "Assets/Data");
+            data.children.Add(new DirectoryHierarchy("Settings", "Assets/Data/Settings"));
+            data.children.Add(new DirectoryHierarchy("InputSystem", "Assets/Data/InputSystem"));
+
+            var level = new DirectoryHierarchy("Level", "Assets/Level");
+            level.children.Add(new DirectoryHierarchy("Scenes", "Assets/Level/Scenes"));
+
             _intendedStructure.Add(art);
             _intendedStructure.Add(code);
+            _intendedStructure.Add(data);
             _intendedStructure.Add(new DirectoryHierarchy("Audio", "Assets/Audio"));
             _intendedStructure.Add(new DirectoryHierarchy("Docs", "Assets/Docs"));
-            _intendedStructure.Add(new DirectoryHierarchy("Level", "Assets/Level"));
+            _intendedStructure.Add(level);
         }
 
         public override void OnGUI()
@@ -114,9 +137,10 @@ namespace UsefulTools.Editor
                 if (_showIntended)
                 {
                     DrawHierarchyList(_intendedStructure, 0, false);
-                    if (GUILayout.Button("Apply Intended Structure", GUILayout.Height(25)))
+                    if (GUILayout.Button("Apply & Organize Structure", GUILayout.Height(25)))
                     {
                         ApplyStructure(_intendedStructure);
+                        OrganizeDefaultAssets();
                         ScanCurrentStructure();
                     }
                 }
@@ -124,7 +148,99 @@ namespace UsefulTools.Editor
 
             EditorGUILayout.Space();
 
-            // 3. Current Hierarchy & GitIgnore
+            // 3. Architecture Structure Setup
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Architecture Structure Setup (Clean Architecture)", EditorStyles.miniBoldLabel);
+                
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    _archDefinition = (ArchitectureDefinition)EditorGUILayout.ObjectField("Architecture Definition", _archDefinition, typeof(ArchitectureDefinition), false);
+                    if (check.changed)
+                    {
+                        if (_archDefinition != null)
+                        {
+                            string path = AssetDatabase.GetAssetPath(_archDefinition);
+                            EditorPrefs.SetString(ArchDefGuidKey, AssetDatabase.AssetPathToGUID(path));
+                        }
+                        else
+                        {
+                            EditorPrefs.SetString(ArchDefGuidKey, "");
+                        }
+                    }
+                }
+
+                if (_archDefinition == null)
+                {
+                    EditorGUILayout.HelpBox("Please assign an ArchitectureDefinition ScriptableObject.", MessageType.Warning);
+                    if (GUILayout.Button("Create New Definition Asset"))
+                    {
+                        string defaultDir = "Assets/Code/AutoGenerate";
+                        if (!AssetDatabase.IsValidFolder(defaultDir))
+                        {
+                            EnsureFolderExists(defaultDir);
+                        }
+
+                        string path = EditorUtility.SaveFilePanelInProject("Save Architecture Definition", "NewArchitectureDefinition", "asset", "Save architecture definition asset", defaultDir);
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            var asset = ScriptableObject.CreateInstance<ArchitectureDefinition>();
+                            asset.SetDefault();
+                            AssetDatabase.CreateAsset(asset, path);
+                            AssetDatabase.SaveAssets();
+                            _archDefinition = asset;
+                            EditorPrefs.SetString(ArchDefGuidKey, AssetDatabase.AssetPathToGUID(path));
+                        }
+                    }
+                }
+                else
+                {
+                    using (var check = new EditorGUI.ChangeCheckScope())
+                    {
+                        _archDefinition.rootPath = EditorGUILayout.TextField("Root Path", _archDefinition.rootPath);
+                        if (check.changed) EditorUtility.SetDirty(_archDefinition);
+                    }
+                    EditorGUILayout.HelpBox($"Layers: {_archDefinition.layers.Count}", MessageType.Info);
+                }
+                
+                EditorGUILayout.Space(5);
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Setup Folders & Asmdefs", GUILayout.Height(30)))
+                    {
+                        if (_archDefinition == null)
+                        {
+                            EditorUtility.DisplayDialog("Error", "Architecture Definition is not assigned.", "OK");
+                            return;
+                        }
+
+                        if (EditorUtility.DisplayDialog("Setup Architecture", $"Generate the architecture under {_archDefinition.rootPath}?", "Yes", "Cancel"))
+                        {
+                            SetupArchitectureStructure();
+                        }
+                    }
+
+                    if (GUILayout.Button("Generate from Existing", GUILayout.Height(30)))
+                    {
+                        if (_archDefinition == null)
+                        {
+                            EditorUtility.DisplayDialog("Info", "Please assign or create an Architecture Definition asset first.", "OK");
+                        }
+                        else
+                        {
+                            Undo.RecordObject(_archDefinition, "Generate Architecture Definition from Existing");
+                            _archDefinition.GenerateFromExisting();
+                            EditorUtility.SetDirty(_archDefinition);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+                }
+            }
+
+            EditorGUILayout.Space();
+
+            // 4. Current Hierarchy & GitIgnore
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 using (new EditorGUILayout.HorizontalScope())
@@ -335,6 +451,132 @@ namespace UsefulTools.Editor
                 if (item.children.Count > 0) ApplyStructure(item.children);
             }
             AssetDatabase.Refresh();
+        }
+
+        private void OrganizeDefaultAssets()
+        {
+            // Move
+            MoveAsset("Assets/Scenes", "Assets/Level/Scenes");
+            MoveAsset("Assets/Settings", "Assets/Data/Settings");
+            MoveAsset("Assets/InputSystem_Actions.inputactions", "Assets/Data/InputSystem/InputSystem_Actions.inputactions");
+
+            // Delete
+            DeleteAsset("Assets/TutorialInfo");
+            DeleteAsset("Assets/Readme.asset");
+            
+            AssetDatabase.Refresh();
+        }
+
+        private void SetupArchitectureStructure()
+        {
+            if (_archDefinition == null) return;
+
+            string basePath = _archDefinition.rootPath;
+            EnsureFolderExists(basePath);
+
+            foreach (var layer in _archDefinition.layers)
+            {
+                string layerPath = $"{basePath}/{layer.relativePath}";
+                EnsureFolderExists(layerPath);
+
+                // Create SubFolders
+                foreach (var sub in layer.subFolders)
+                {
+                    EnsureFolderExists($"{layerPath}/{sub}");
+                }
+
+                // Create Asmdef
+                if (layer.createAsmdef)
+                {
+                    CreateAsmdef(layerPath, layer.layerName, layer.references);
+                }
+            }
+
+            AssetDatabase.Refresh();
+            Debug.Log("[UsefulTools] Architecture structure and asmdefs setup completed successfully.");
+            ScanCurrentStructure();
+        }
+
+        private void CreateAsmdef(string folderPath, string assemblyName, List<string> references)
+        {
+            string filePath = $"{folderPath}/{assemblyName}.asmdef";
+            if (File.Exists(filePath)) return;
+
+            // Build references string
+            string refStr = "";
+            if (references != null && references.Count > 0)
+            {
+                var refList = references.Select(r => $"\"{r}\"").ToList();
+                refStr = string.Join(",\n        ", refList);
+            }
+
+            string content = $@"{{
+    ""name"": ""{assemblyName}"",
+    ""rootNamespace"": """",
+    ""references"": [
+        {refStr}
+    ],
+    ""includePlatforms"": [],
+    ""excludePlatforms"": [],
+    ""allowUnsafeCode"": false,
+    ""overrideReferences"": false,
+    ""precompiledReferences"": [],
+    ""autoReferenced"": true,
+    ""defineConstraints"": [],
+    ""versionDefines"": [],
+    ""noEngineReferences"": false
+}}";
+            File.WriteAllText(filePath, content);
+        }
+
+        private void MoveAsset(string from, string to)
+        {
+            if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(from) != null)
+            {
+                // Ensure destination parent exists
+                string parent = Path.GetDirectoryName(to).Replace("\\", "/");
+                if (!AssetDatabase.IsValidFolder(parent))
+                {
+                    EnsureFolderExists(parent);
+                }
+
+                // If destination already exists, don't move (to avoid errors)
+                if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(to) != null)
+                {
+                    Debug.LogWarning($"[UsefulTools] Skip moving {from} to {to} because destination already exists.");
+                    return;
+                }
+
+                string error = AssetDatabase.MoveAsset(from, to);
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Debug.LogWarning($"[UsefulTools] Failed to move {from} to {to}: {error}");
+                }
+            }
+        }
+
+        private void DeleteAsset(string path)
+        {
+            if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path) != null)
+            {
+                AssetDatabase.DeleteAsset(path);
+            }
+        }
+
+        private void EnsureFolderExists(string folderPath)
+        {
+            if (string.IsNullOrEmpty(folderPath) || folderPath == "Assets") return;
+            if (AssetDatabase.IsValidFolder(folderPath)) return;
+
+            string parent = Path.GetDirectoryName(folderPath).Replace("\\", "/");
+            string folder = Path.GetFileName(folderPath);
+
+            if (!AssetDatabase.IsValidFolder(parent))
+            {
+                EnsureFolderExists(parent);
+            }
+
+            AssetDatabase.CreateFolder(parent, folder);
         }
 
         private void Install(string identifier)
