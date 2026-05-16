@@ -1,15 +1,16 @@
-using Presentation;
 using UnityEngine;
+using UsefulTools.UtilityUnity.Runtime.UtilityUnity;
+using UsefulVr.Presentation.Runtime.Player;
 
 namespace UsefulVr.View.Runtime.Player
 {
     public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
     {
-        [Header("Physics")]
-        [SerializeField] private Rigidbody _rigidbody;
+        [Header("Physics")] [SerializeField] private Rigidbody _rigidbody;
 
-        [Header("XR References")]
-        [SerializeField] private Transform _xrOrigin;
+        [Header("XR References")] [SerializeField]
+        private Transform _xrOrigin;
+
         [SerializeField] private Transform _cameraOffset;
         [SerializeField] private Transform _mainCamera;
 

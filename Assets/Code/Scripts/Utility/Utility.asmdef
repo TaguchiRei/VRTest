@@ -1,6 +1,6 @@
 {
     "name": "Utility",
-    "rootNamespace": "UsefulVr.Utility.Runtime",
+    "rootNamespace": "UsefulTools.Utility.Runtime",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

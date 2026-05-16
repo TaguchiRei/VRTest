@@ -1,13 +1,13 @@
 {
     "name": "Infrastructure",
-    "rootNamespace": "UsefulVr.Infrastracture.Runtime",
+    "rootNamespace": "UsefulTools.Infrastructure.Runtime",
     "references": [
         "Utility",
         "UtilityUnity",
         "AutoGenerate",
         "UsefulAttributes",
         "Unity.InputSystem",
-        "Presentation"
+        "Application"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

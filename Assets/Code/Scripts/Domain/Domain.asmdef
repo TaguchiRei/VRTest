@@ -1,6 +1,6 @@
 {
     "name": "Domain",
-    "rootNamespace": "UsefulVr.Domain.Runtime",
+    "rootNamespace": "UsefulTools.Domain.Runtime",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

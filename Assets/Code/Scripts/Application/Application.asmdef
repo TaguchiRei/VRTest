@@ -1,6 +1,6 @@
 {
     "name": "Application",
-    "rootNamespace": "UsefulVr.Application.Runtime",
+    "rootNamespace": "UsefulTools.Application.Runtime",
     "references": [
         "Domain",
         "Utility",

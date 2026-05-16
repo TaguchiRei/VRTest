@@ -1,120 +1,212 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UsefulTools.AutoGenerate;
+using UsefulTools.UtilityUnity.Runtime.UtilityUnity;
 
-public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
+namespace UsefulTools.Infrastructure.Runtime.Input
 {
-    [SerializeField] private InputActionAsset _actionAsset;
-
-    public override void Initialize()
+    public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
     {
-        base.Initialize();
-        _actionAsset.Enable();
-    }
+        [SerializeField] private InputActionAsset _actionAsset;
 
-    private void OnDestroy()
-    {
-        _actionAsset.Disable();
-    }
+        private readonly Dictionary<Delegate, Action> _registeredActions = new();
 
-    public InputContext<T> ReadValue<T, TAction>(ActionMaps actionMap, TAction actionName)
-        where T : unmanaged
-        where TAction : Enum
-    {
-        var action = GetAction(actionMap.ToString(), actionName.ToString());
-        if (action == null)
+        public override void Initialize()
         {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return new InputContext<T>(InputActionPhase.Disabled, default);
+            base.Initialize();
+            _actionAsset.Enable();
         }
 
-        return new InputContext<T>(action.phase, action.ReadValue<T>());
-    }
-
-    public void ChangeRegistrationStarted<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
-    {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-        if (inputAction == null)
+        private void Update()
         {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
+            foreach (var updateAction in _registeredActions.Values)
+                updateAction();
         }
 
-        if (isRegister) inputAction.started += action;
-        else inputAction.started -= action;
-    }
-
-    public void ChangeRegistrationCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
-    {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-        if (inputAction == null)
+        private void OnDestroy()
         {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
+            _registeredActions.Clear();
+            _actionAsset.Disable();
         }
 
-        if (isRegister) inputAction.canceled += action;
-        else inputAction.canceled -= action;
-    }
-
-    public void ChangeRegistrationStartCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-        Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
-    {
-        var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
-        if (inputAction == null)
+        public InputContext<T> ReadValue<T, TAction>(ActionMaps actionMap, TAction actionName)
+            where T : unmanaged
+            where TAction : Enum
         {
-            Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
-            return;
+            var action = GetAction(actionMap.ToString(), actionName.ToString());
+            if (action == null)
+            {
+                Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+                return new InputContext<T>(InputActionPhase.Disabled, default);
+            }
+
+            return new InputContext<T>(action.phase, action.ReadValue<T>());
         }
 
-        if (isRegister)
+        public void RegistrationReadValue<T, TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputContext<T>> action, bool isRegister) where T : unmanaged where TAction : Enum
         {
-            inputAction.started += action;
-            inputAction.canceled += action;
-        }
-        else
-        {
-            inputAction.started -= action;
-            inputAction.canceled -= action;
-        }
-    }
+            if (isRegister)
+            {
+                if (_registeredActions.ContainsKey(action))
+                    return;
 
-    public void SwitchActionMap(ActionMaps actionMap)
-    {
-        foreach (var map in _actionAsset.actionMaps) map.Disable();
-        FindMap(actionMap)?.Enable();
-    }
+                void UpdateAction()
+                {
+                    action?.Invoke(ReadValue<T, TAction>(actionMap, actionName));
+                }
 
-    public void EnableActionMap(ActionMaps actionMap) => FindMap(actionMap)?.Enable();
-    public void DisableActionMap(ActionMaps actionMap) => FindMap(actionMap)?.Disable();
-
-    public ActionMaps[] GetActiveActionMap()
-    {
-        var activeMaps = new System.Collections.Generic.List<ActionMaps>();
-        foreach (var map in _actionAsset.actionMaps)
-        {
-            if (!map.enabled) continue;
-            if (Enum.TryParse(map.name, out ActionMaps parsed)) activeMaps.Add(parsed);
-            else Debug.LogWarning($"[InputDispatcher] ActionMap {map.name} は Enum に存在しません。");
+                _registeredActions.Add(action, UpdateAction);
+            }
+            else
+            {
+                _registeredActions.Remove(action);
+            }
         }
 
-        return activeMaps.ToArray();
-    }
+        public void RegistrationStarted<TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
+        {
+            var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
+            if (inputAction == null)
+            {
+                Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+                return;
+            }
 
-    public void EnableInput() => _actionAsset.Enable();
-    public void DisableInput() => _actionAsset.Disable();
+            if (isRegister)
+            {
+                inputAction.started += action;
+            }
+            else
+            {
+                inputAction.started -= action;
+            }
+        }
 
-    private InputActionMap FindMap(ActionMaps actionMap)
-    {
-        var map = _actionAsset.FindActionMap(actionMap.ToString());
-        if (map == null) Debug.LogWarning($"[InputDispatcher] ActionMap {actionMap} は見つかりませんでした。");
-        return map;
-    }
+        public void RegistrationCancelled<TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
+        {
+            var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
+            if (inputAction == null)
+            {
+                Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+                return;
+            }
 
-    private InputAction GetAction(string actionMap, string actionName)
-    {
-        return _actionAsset.FindActionMap(actionMap)?.FindAction(actionName);
+            if (isRegister)
+            {
+                inputAction.canceled += action;
+            }
+            else
+            {
+                inputAction.canceled -= action;
+            }
+        }
+
+        public void RegistrationStartCancelled<TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
+        {
+            var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
+            if (inputAction == null)
+            {
+                Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+                return;
+            }
+
+            if (isRegister)
+            {
+                inputAction.started += action;
+                inputAction.canceled += action;
+            }
+            else
+            {
+                inputAction.started -= action;
+                inputAction.canceled -= action;
+            }
+        }
+
+        public void RegistrationPerformed<TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
+        {
+            var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
+            if (inputAction == null)
+            {
+                Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+                return;
+            }
+
+            if (isRegister)
+            {
+                inputAction.performed += action;
+            }
+            else
+            {
+                inputAction.performed -= action;
+            }
+        }
+
+        public void RegistrationAll<TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum
+        {
+            var inputAction = GetAction(actionMap.ToString(), actionName.ToString());
+            if (inputAction == null)
+            {
+                Debug.LogWarning($"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+                return;
+            }
+
+            if (isRegister)
+            {
+                inputAction.started += action;
+                inputAction.performed += action;
+                inputAction.canceled += action;
+            }
+            else
+            {
+                inputAction.started -= action;
+                inputAction.performed -= action;
+                inputAction.canceled -= action;
+            }
+        }
+
+        public void SwitchActionMap(ActionMaps actionMap)
+        {
+            foreach (var map in _actionAsset.actionMaps) map.Disable();
+            FindMap(actionMap)?.Enable();
+        }
+
+        public void EnableActionMap(ActionMaps actionMap) => FindMap(actionMap)?.Enable();
+        public void DisableActionMap(ActionMaps actionMap) => FindMap(actionMap)?.Disable();
+
+        public ActionMaps[] GetActiveActionMap()
+        {
+            var activeMaps = new List<ActionMaps>();
+            foreach (var map in _actionAsset.actionMaps)
+            {
+                if (!map.enabled) continue;
+                if (Enum.TryParse(map.name, out ActionMaps parsed)) activeMaps.Add(parsed);
+                else Debug.LogWarning($"[InputDispatcher] ActionMap {map.name} は Enum に存在しません。");
+            }
+
+            return activeMaps.ToArray();
+        }
+
+        public void EnableInput() => _actionAsset.Enable();
+        public void DisableInput() => _actionAsset.Disable();
+
+        private InputActionMap FindMap(ActionMaps actionMap)
+        {
+            var map = _actionAsset.FindActionMap(actionMap.ToString());
+            if (map == null) Debug.LogWarning($"[InputDispatcher] ActionMap {actionMap} は見つかりませんでした。");
+            return map;
+        }
+
+        private InputAction GetAction(string actionMap, string actionName)
+        {
+            return _actionAsset.FindActionMap(actionMap)?.FindAction(actionName);
+        }
     }
 }

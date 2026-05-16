@@ -1,6 +1,6 @@
 {
     "name": "DataAccess",
-    "rootNamespace": "UsefulVr.DataAccess.Runtime",
+    "rootNamespace": "UsefulTools.DataAccess.Runtime",
     "references": [
         "Application",
         "Domain",

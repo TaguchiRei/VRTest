@@ -1,4 +1,7 @@
-public class IVrPlayerInfra
+namespace UsefulTools.Application.Runtime.Player
 {
-    
+    public interface IVrPlayerInfra
+    {
+        
+    }
 }

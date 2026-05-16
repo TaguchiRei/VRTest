@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Presentation
+namespace UsefulVr.Presentation.Runtime.Player
 {
     public interface IVrMovementView
     {

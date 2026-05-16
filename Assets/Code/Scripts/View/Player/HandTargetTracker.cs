@@ -1,22 +1,25 @@
 using UnityEngine;
 
-public class HandTargetTracker : MonoBehaviour
+namespace UsefulVr.View.Runtime.Player
 {
-    [Header("XR Tracker")] [SerializeField]
-    private Transform _tracker;
-
-    [Header("Offset")] [SerializeField] private Vector3 _positionOffset;
-    [SerializeField] private Vector3 _rotationOffsetEuler;
-
-    void LateUpdate()
+    public class HandTargetTracker : MonoBehaviour
     {
-        if (_tracker == null) return;
+        [Header("XR Tracker")] [SerializeField]
+        private Transform _tracker;
 
-        transform.position =
-            _tracker.TransformPoint(_positionOffset);
+        [Header("Offset")] [SerializeField] private Vector3 _positionOffset;
+        [SerializeField] private Vector3 _rotationOffsetEuler;
 
-        transform.rotation =
-            _tracker.rotation *
-            Quaternion.Euler(_rotationOffsetEuler);
+        void LateUpdate()
+        {
+            if (_tracker == null) return;
+
+            transform.position =
+                _tracker.TransformPoint(_positionOffset);
+
+            transform.rotation =
+                _tracker.rotation *
+                Quaternion.Euler(_rotationOffsetEuler);
+        }
     }
 }

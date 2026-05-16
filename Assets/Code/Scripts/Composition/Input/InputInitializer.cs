@@ -1,11 +1,15 @@
 using UnityEngine;
+using UsefulTools.Infrastructure.Runtime.Input;
 
-public class InputInitializer : MonoBehaviour
+namespace UsefulTools.Composition.Runtime.Input
 {
-    public InputDispatcher InputDispatcher;
-
-    public void Initialize()
+    public class InputInitializer : MonoBehaviour
     {
-        InputDispatcher.Initialize();
+        public InputDispatcher InputDispatcher;
+
+        public void Initialize()
+        {
+            InputDispatcher.Initialize();
+        }
     }
 }

@@ -286,8 +286,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 259568921}
-  - component: {fileID: 259568920}
   - component: {fileID: 259568919}
+  - component: {fileID: 259568922}
   m_Layer: 0
   m_Name: InputDIspatcher
   m_TagString: Untagged
@@ -307,21 +307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90232efb168208e4db4ca011ea71b1cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Composition::InputInitializer
-  InputDispatcher: {fileID: 259568920}
---- !u!114 &259568920
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 259568918}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cac8fb90d99ad334c9be2afa5497afd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Controller::InputDispatcher
-  InitializationOrder: 0
-  _actionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  InputDispatcher: {fileID: 259568922}
 --- !u!4 &259568921
 Transform:
   m_ObjectHideFlags: 0
@@ -337,6 +323,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &259568922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259568918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57460871bddf6e94f800ad9cbcd8ca6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Infrastructure::UsefulTools.Infrastructure.Runtime.Input.InputDispatcher
+  InitializationOrder: 0
+  _actionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1 &652695159
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,7 +1123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Composition::IngameComposition
   _inputInitializer: {fileID: 259568919}
-  _playerInitializer: {fileID: 1486465779}
+  _playerInitializer: {fileID: 0}
 --- !u!4 &933393301
 Transform:
   m_ObjectHideFlags: 0
@@ -1468,7 +1468,6 @@ GameObject:
   - component: {fileID: 1486465776}
   - component: {fileID: 1486465775}
   - component: {fileID: 1486465774}
-  - component: {fileID: 1486465780}
   - component: {fileID: 1486465779}
   m_Layer: 0
   m_Name: XR Origin (VR)
@@ -1558,6 +1557,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: View::VrPlayerView
   InitializationOrder: 0
   _rigidbody: {fileID: 1486465775}
+  _xrOrigin: {fileID: 0}
+  _cameraOffset: {fileID: 0}
+  _mainCamera: {fileID: 0}
 --- !u!114 &1486465777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1597,29 +1599,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1486465772}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbedce99c43833944b742359bcb33c04, type: 3}
+  m_Script: {fileID: 11500000, guid: 2bdf330f43b22b24c8e80fd4b3b0b8ff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Composition::PlayerInitializer
-  vrPlayerView: {fileID: 1486465776}
-  vrPlayerInfra: {fileID: 1486465780}
-  _moveSpeed: 10
-  _gravityPower: 9.81
-  _gravityVector: {x: 0, y: -1, z: 0}
---- !u!114 &1486465780
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1486465772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4372f3978bdc364c99cf564229cc022, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Controller::Code.Scripts.Infrastructure.Player.VrPlayerInfra
+  m_EditorClassIdentifier: Infrastructure::UsefulVr.Infrastructure.Runtime.Player.VrPlayerMovementInfra
   InitializationOrder: 0
-  _cameraTransform: {fileID: 2088003505}
-  _bodyRoot: {fileID: 918255139}
 --- !u!1 &1505898304
 GameObject:
   m_ObjectHideFlags: 0

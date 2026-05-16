@@ -1,4 +1,5 @@
 using UnityEngine;
+using UsefulVr.Domain.Runtime.Player;
 
 namespace Code.Scripts.Domain.Player
 {
@@ -12,12 +13,17 @@ namespace Code.Scripts.Domain.Player
         public LookDirectionValue LookDirection { get; private set; }
         public MoveSpeed MoveSpeed { get; private set; }
 
-        public PlayerMovementEntity(GravityValue gravity, MoveSpeed moveSpeed)
+        public PlayerMovementEntity(
+            GravityValue gravity,
+            MoveSpeed moveSpeed)
         {
             Gravity = gravity;
             MoveSpeed = moveSpeed;
+
             LastMovePower = MovePowerValue.Zero;
-            LookDirection = LookDirectionValue.Forward;
+
+            // 初期値としてのみ使用
+            LookDirection = new LookDirectionValue(Vector3.forward);
         }
 
         public void UpdateMovePower(Vector3 newPower)
@@ -30,9 +36,15 @@ namespace Code.Scripts.Domain.Player
             Gravity = gravity;
         }
 
-        public void UpdateLookDirection(Vector2 direction)
+        public void UpdateLookDirection(Vector3 direction)
         {
-            LookDirection = new LookDirectionValue(direction);
+            if (direction.sqrMagnitude < 0.001f)
+            {
+                return;
+            }
+
+            LookDirection =
+                new LookDirectionValue(direction.normalized);
         }
 
         public void UpdateMoveSpeed(MoveSpeed moveSpeed)

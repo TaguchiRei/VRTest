@@ -1,6 +1,6 @@
 {
     "name": "View",
-    "rootNamespace": "UsefulVr.View.Runtime",
+    "rootNamespace": "UsefulTools.VIew.Runtime",
     "references": [
         "Presentation",
         "UtilityUnity",
