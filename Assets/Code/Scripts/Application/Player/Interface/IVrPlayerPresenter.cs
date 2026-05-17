@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface IPlayerPresenter
+public interface IVrPlayerPresenter
 {
     /// <summary> Rigidbody.linerVelocity </summary>
     Vector3 Velocity { get; set; }

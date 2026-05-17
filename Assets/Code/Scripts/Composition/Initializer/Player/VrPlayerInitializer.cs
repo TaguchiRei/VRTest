@@ -9,7 +9,7 @@ using UsefulVr.View.Runtime.Player;
 
 namespace UsefulVr.Composition.Runtime.Player
 {
-    public class PlayerInitializer : InitializerBase, IInjectable<IInputDispatcher>
+    public class VrPlayerInitializer : InitializerBase, IInjectable<IInputDispatcher>
     {
         [SerializeField] private VrPlayerMovementView _vrPlayerMovementView;
         [SerializeField] private Vector3 _gravityVector;
@@ -18,7 +18,7 @@ namespace UsefulVr.Composition.Runtime.Player
         [SerializeField] private float _rotateSpeed;
         [SerializeField] private float _deadZone;
         private VrPlayerMovementService _playerMovementService;
-        private VrPlayerMovementPresenter _vrPlayerPresenter;
+        private VrVrPlayerMovementPresenter _vrVrPlayerPresenter;
         private VrPlayerMovementEntity _vrPlayerMovementEntity;
 
         //IInjectableで登録する
@@ -27,12 +27,12 @@ namespace UsefulVr.Composition.Runtime.Player
         public override void Initialize()
         {
             base.Initialize();
-            _vrPlayerPresenter = new(_vrPlayerMovementView);
+            _vrVrPlayerPresenter = new(_vrPlayerMovementView);
             _vrPlayerMovementEntity = new(
                 new(_gravityVector, _gravityPower),
                 new(_moveSpeed),
                 _rotateSpeed, _deadZone);
-            _playerMovementService = new(_vrPlayerPresenter, _vrPlayerMovementEntity, _inputDispatcher);
+            _playerMovementService = new(_vrVrPlayerPresenter, _vrPlayerMovementEntity, _inputDispatcher);
 
             _vrPlayerMovementView.Initialize();
         }

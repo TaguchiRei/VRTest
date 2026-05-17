@@ -15,15 +15,15 @@ namespace UsefulVr.Application.Runtime.Player
         private const float CAMERA_OFFSET_THRESHOLD = 0.25f;
 
         private readonly IInputDispatcher _inputDispatcher;
-        private readonly IPlayerPresenter _playerPresenter;
+        private readonly IVrPlayerPresenter _vrPlayerPresenter;
         private readonly VrPlayerMovementEntity _entity;
 
         public VrPlayerMovementService(
-            IPlayerPresenter playerPresenter,
+            IVrPlayerPresenter vrPlayerPresenter,
             VrPlayerMovementEntity entity,
             IInputDispatcher inputDispatcher)
         {
-            _playerPresenter = playerPresenter;
+            _vrPlayerPresenter = vrPlayerPresenter;
             _entity = entity;
             _inputDispatcher = inputDispatcher;
 
@@ -40,7 +40,7 @@ namespace UsefulVr.Application.Runtime.Player
         {
             if (!input.IsActive) return;
 
-            Vector3 currentVelocity = _playerPresenter.Velocity;
+            Vector3 currentVelocity = _vrPlayerPresenter.Velocity;
             // 前回移動分除去
             Vector3 velocityWithoutLastMove =
                 MovementLogic.CalculateVelocityAfterStop(currentVelocity, _entity.LastMovePower.Value);
@@ -56,11 +56,11 @@ namespace UsefulVr.Application.Runtime.Player
                 _entity.UpdateMovePower(moveVector);
 
                 // Velocity反映
-                _playerPresenter.Velocity = velocityWithoutLastMove + moveVector;
+                _vrPlayerPresenter.Velocity = velocityWithoutLastMove + moveVector;
             }
             else if (input.IsCanceled)
             {
-                _playerPresenter.Velocity = velocityWithoutLastMove;
+                _vrPlayerPresenter.Velocity = velocityWithoutLastMove;
             }
         }
 
@@ -77,7 +77,7 @@ namespace UsefulVr.Application.Runtime.Player
             // 現在の重力の逆方向のベクトルを旋回軸とする
             Vector3 rotationAxis = -_entity.Gravity.Direction.normalized;
             Quaternion deltaRotation = Quaternion.AngleAxis(turnAngle, rotationAxis);
-            _playerPresenter.Rotation = deltaRotation * _playerPresenter.Rotation;
+            _vrPlayerPresenter.Rotation = deltaRotation * _vrPlayerPresenter.Rotation;
 
             // 本体が回転したため、Entityが保持しているLookDirectionも一緒に回転させて同期する
             Vector3 newLookDirection = deltaRotation * _entity.LookDirection.Value;
@@ -89,7 +89,7 @@ namespace UsefulVr.Application.Runtime.Player
         /// </summary>
         public void ApplyGravity()
         {
-            _playerPresenter.AddForce(_entity.Gravity.GravityForce, ForceMode.Acceleration);
+            _vrPlayerPresenter.AddForce(_entity.Gravity.GravityForce, ForceMode.Acceleration);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace UsefulVr.Application.Runtime.Player
                 return;
             }
 
-            _playerPresenter.SetOffset(offset);
+            _vrPlayerPresenter.SetOffset(offset);
         }
 
         /// <summary>

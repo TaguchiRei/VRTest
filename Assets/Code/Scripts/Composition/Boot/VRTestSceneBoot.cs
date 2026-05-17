@@ -10,7 +10,7 @@ namespace VRTest.Composition.Runtime.Boot
         [SerializeField] private VRTestSceneContainer _container;
 
         [SerializeField] private InputInitializer _inputInitializer;
-        [SerializeField] private PlayerInitializer _playerInitializer;
+        [SerializeField] private VrPlayerInitializer vrPlayerInitializer;
 
         private void Start()
         {
@@ -20,16 +20,16 @@ namespace VRTest.Composition.Runtime.Boot
 
         private void Inject()
         {
-            if (_playerInitializer != null && _container.TryGet<IInputDispatcher>(out var arg_playerInitializer_0))
+            if (vrPlayerInitializer != null && _container.TryGet<IInputDispatcher>(out var arg_playerInitializer_0))
             {
-                _playerInitializer.Inject(arg_playerInitializer_0);
+                vrPlayerInitializer.Inject(arg_playerInitializer_0);
             }
         }
 
         private void Initialize()
         {
             if (_inputInitializer != null) _inputInitializer.Initialize();
-            if (_playerInitializer != null) _playerInitializer.Initialize();
+            if (vrPlayerInitializer != null) vrPlayerInitializer.Initialize();
         }
     }
 }
