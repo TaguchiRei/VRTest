@@ -1,19 +1,19 @@
+using Code.Scripts.Domain.Player;
 using UnityEngine;
-using UsefulVr.Domain.Runtime.Player;
 
-namespace Code.Scripts.Domain.Player
+namespace UsefulVr.Domain.Runtime.Player
 {
     /// <summary>
     /// プレイヤーの移動状態を管理するエンティティ
     /// </summary>
-    public class PlayerMovementEntity
+    public class VrPlayerMovementEntity
     {
         public GravityValue Gravity { get; private set; }
         public MovePowerValue LastMovePower { get; private set; }
         public LookDirectionValue LookDirection { get; private set; }
         public MoveSpeed MoveSpeed { get; private set; }
 
-        public PlayerMovementEntity(
+        public VrPlayerMovementEntity(
             GravityValue gravity,
             MoveSpeed moveSpeed)
         {

@@ -1,6 +1,8 @@
 using UnityEngine;
-using Code.Scripts.Domain.Player;
+using UsefulTools.AutoGenerate;
+using UsefulTools.Infrastructure.Runtime.Input;
 using UsefulVr.Domain.Runtime.Domain;
+using UsefulVr.Domain.Runtime.Player;
 
 namespace UsefulVr.Application.Runtime.Player
 {
@@ -11,15 +13,20 @@ namespace UsefulVr.Application.Runtime.Player
     {
         private const float CAMERA_OFFSET_THRESHOLD = 0.25f;
 
+        private readonly IInputDispatcher _inputDispatcher;
         private readonly IPlayerPresenter _playerPresenter;
-        private readonly PlayerMovementEntity _entity;
+        private readonly VrPlayerMovementEntity _entity;
 
         public VrPlayerMovementService(
             IPlayerPresenter playerPresenter,
-            PlayerMovementEntity entity)
+            VrPlayerMovementEntity entity,
+            IInputDispatcher inputDispatcher)
         {
             _playerPresenter = playerPresenter;
             _entity = entity;
+            _inputDispatcher = inputDispatcher;
+
+            Registration(true);
         }
 
         /// <summary>
@@ -77,7 +84,7 @@ namespace UsefulVr.Application.Runtime.Player
         /// <summary>
         /// 入力移動
         /// </summary>
-        public void Move(Vector2 input)
+        public void Move(InputContext<Vector2> input)
         {
             Vector3 currentVelocity =
                 _playerPresenter.Velocity;
@@ -91,7 +98,7 @@ namespace UsefulVr.Application.Runtime.Player
             // 新規移動方向
             Vector3 moveVector =
                 MovementLogic.CalculateMoveVector(
-                    input,
+                    input.Value,
                     _entity.Gravity.Direction,
                     _entity.LookDirection.Value);
 
@@ -115,6 +122,14 @@ namespace UsefulVr.Application.Runtime.Player
             _playerPresenter.AddForce(
                 _entity.Gravity.GravityForce,
                 ForceMode.Acceleration);
+        }
+
+        /// <summary>
+        /// 入力イベントの登録状態を変更する
+        /// </summary>
+        private void Registration(bool isRegister)
+        {
+            //_inputDispatcher.RegistrationReadValue();
         }
     }
 }

@@ -5,14 +5,14 @@ namespace UsefulVr.Presentation.Runtime.Player
     /// <summary>
     /// Applicationの計算をもとにViewを動かすプレゼンター
     /// </summary>
-    public class PlayerMovementPresenter : IPlayerPresenter
+    public class VrPlayerMovementPresenter : IPlayerPresenter
     {
         private readonly IVrMovementView _movementView;
 
         public Vector3 GravityVector { get; set; }
         public float GravityPower { get; set; }
 
-        public PlayerMovementPresenter(IVrMovementView view)
+        public VrPlayerMovementPresenter(IVrMovementView view)
         {
             _movementView = view;
         }

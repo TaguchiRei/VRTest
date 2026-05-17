@@ -12,7 +12,7 @@ namespace UsefulTools.UtilityUnity.Runtime.UtilityUnity
 
         private protected void Awake()
         {
-            enabled = false;
+            Initialized = false;
         }
 
         public virtual void Initialize()
@@ -20,7 +20,6 @@ namespace UsefulTools.UtilityUnity.Runtime.UtilityUnity
             if (Initialized) return;
 
             Initialized = true;
-            enabled = true;
         }
 
         public int CompareTo(InitializerBase other)

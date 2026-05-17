@@ -7,7 +7,7 @@ using UsefulTools.UtilityUnity.Runtime.UtilityUnity;
 
 namespace UsefulTools.Infrastructure.Runtime.Input
 {
-    public class InputDispatcher : InitializerBase, IInputDispatcher
+    public class InputDispatcher : InitializableMonoBehaviour, IInputDispatcher
     {
         [SerializeField] private InputActionAsset _actionAsset;
 
