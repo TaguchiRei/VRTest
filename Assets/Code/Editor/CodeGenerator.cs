@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UsefulTools.UtilityUnity.Runtime.Initialize;
@@ -17,7 +15,7 @@ public class CodeGenerator : EditorWindow
     private string _code;
     private Vector2 _scrollPosition;
     private GenerateMode _generateMode;
-    
+
     private GUIStyle _headerStyle;
     private GUIStyle _sectionStyle;
 
@@ -286,6 +284,11 @@ public class CodeGenerator : EditorWindow
                 {
                     _generateCodeFunc = GetInterfaceCode;
                     _generateMode = GenerateMode.Interface;
+                }),
+                ("Container", () =>
+                {
+                    _generateCodeFunc = GetContainerCode;
+                    _generateMode = GenerateMode.Container;
                 })
             });
         }
@@ -496,6 +499,82 @@ public class CodeGenerator : EditorWindow
 }}";
     }
 
+    private string GetContainerCode(string className)
+    {
+        string code = "using System;\nusing System.Collections.Generic;\nusing UnityEngine;";
+
+        code = _useSummary
+            ? code + @"
+/// <summary>
+/// 
+/// </summary>
+"
+            : code;
+
+        code += $@"
+public sealed class {className} : MonoBehaviour
+{{
+    private static {className} _instance;
+
+    public static {className} Instance
+    {{
+        get
+        {{
+            if (_instance == null)
+            {{
+                _instance = FindFirstObjectByType<{className}>();
+                if (_instance == null)
+                {{
+                    var go = new GameObject(""{className}"");
+                    _instance = go.AddComponent<{className}>();
+                }}
+            }}
+            return _instance;
+        }}
+    }}
+
+    private readonly Dictionary<Type, object> _instances = new();
+
+    public static void Register<T>(T instance)
+    {{
+        var type = typeof(T);
+
+        if (Instance._instances.ContainsKey(type))
+        {{
+            Debug.LogWarning($""{{type.Name}} already registered."");
+            return;
+        }}
+
+        Instance._instances.Add(type, instance);
+    }}
+
+    public bool TryGet<T>(out T result)
+    {{
+        if (_instances.TryGetValue(typeof(T), out var value))
+        {{
+            result = (T)value;
+            return true;
+        }}
+
+        result = default;
+        return false;
+    }}
+
+    private void Awake()
+    {{
+        if (_instance == null)
+        {{
+            _instance = this;
+        }}
+        else if (_instance != this)
+        {{
+            Destroy(gameObject);
+        }}
+    }}
+}}";
+        return code;
+    }
+
     #endregion
 
     #region SceneBoot Logic
@@ -508,13 +587,13 @@ public class CodeGenerator : EditorWindow
             return;
         }
 
-        // Find all concrete InitializableMonoBehaviour in the active scene
-        var initializables = FindObjectsOfType<InitializableMonoBehaviour>()
+        // Find all concrete InitializerBase in the active scene
+        var initializers = FindObjectsByType<InitializerBase>(FindObjectsSortMode.None)
             .Where(obj => !obj.GetType().IsAbstract)
             .OrderBy(obj => obj.InitializationOrder)
             .ToList();
 
-        string bootCode = GetSceneBootCode(_codeName, initializables);
+        string bootCode = GetSceneBootCode(_codeName, initializers);
         string containerCode = GetSceneContainerCode(_codeName);
 
         // Ensure directory exists
@@ -527,18 +606,15 @@ public class CodeGenerator : EditorWindow
         string bootPath = Path.Combine(_sceneGenerationPath, _codeName + "Boot.cs");
         File.WriteAllText(bootPath, bootCode);
 
-        // Generate Container file (Do NOT overwrite if exists)
         string containerPath = Path.Combine(_sceneGenerationPath, _codeName + "Container.cs");
-        if (!File.Exists(containerPath))
-        {
-            File.WriteAllText(containerPath, containerCode);
-        }
+        File.WriteAllText(containerPath, containerCode);
+
 
         AssetDatabase.Refresh();
         Debug.Log($"Generated Scene Boot at {bootPath}");
     }
 
-    private string GetSceneBootCode(string sceneName, List<InitializableMonoBehaviour> objects)
+    private string GetSceneBootCode(string sceneName, List<InitializerBase> objects)
     {
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("using UnityEngine;");
@@ -555,14 +631,14 @@ public class CodeGenerator : EditorWindow
         sb.AppendLine("");
 
         // Field definitions for each instance
-        var instanceToVarName = new Dictionary<InitializableMonoBehaviour, string>();
+        var instanceToVarName = new Dictionary<InitializerBase, string>();
         var typeCount = new Dictionary<Type, int>();
 
         foreach (var obj in objects)
         {
             var type = obj.GetType();
             if (!typeCount.ContainsKey(type)) typeCount[type] = 0;
-            
+
             string baseVarName = char.ToLower(type.Name[0]) + type.Name.Substring(1);
             string varName = typeCount[type] == 0 ? baseVarName : $"{baseVarName}{typeCount[type]}";
             instanceToVarName[obj] = varName;
@@ -590,7 +666,7 @@ public class CodeGenerator : EditorWindow
             {
                 var args = injectInterface.GetGenericArguments();
                 var conditions = new List<string>();
-                
+
                 // Instance itself is already a field, so we just check if it's assigned
                 conditions.Add($"_{varName} != null");
 
@@ -598,7 +674,7 @@ public class CodeGenerator : EditorWindow
                 for (int i = 0; i < args.Length; i++)
                 {
                     var argVarName = $"arg{varName}_{i}";
-                    conditions.Add($"_container.Get<{args[i].Name}>(out var {argVarName})");
+                    conditions.Add($"_container.TryGet<{args[i].Name}>(out var {argVarName})");
                     argNames.Add(argVarName);
                 }
 
@@ -633,22 +709,80 @@ public class CodeGenerator : EditorWindow
 
     private string GetSceneContainerCode(string sceneName)
     {
+        string className = sceneName + "Container";
         StringBuilder sb = new StringBuilder();
+        sb.AppendLine("using System;");
+        sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine("using UnityEngine;");
+
         if (!string.IsNullOrEmpty(_sceneNamespace))
         {
             sb.AppendLine($"namespace {_sceneNamespace}");
             sb.AppendLine("{");
         }
 
-        sb.AppendLine($"    public class {sceneName}Container : MonoBehaviour");
-        sb.AppendLine("    {");
-        sb.AppendLine("        public bool Get<T>(out T result)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            result = default;");
-        sb.AppendLine("            return false;");
-        sb.AppendLine("        }");
-        sb.AppendLine("    }");
+        string indent = !string.IsNullOrEmpty(_sceneNamespace) ? "    " : "";
+
+        sb.AppendLine($"{indent}public sealed class {className} : MonoBehaviour");
+        sb.AppendLine($"{indent}{{");
+        sb.AppendLine($"{indent}    private static {className} _instance;");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}    public static {className} Instance");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        get");
+        sb.AppendLine($"{indent}        {{");
+        sb.AppendLine($"{indent}            if (_instance == null)");
+        sb.AppendLine($"{indent}            {{");
+        sb.AppendLine($"{indent}                _instance = FindFirstObjectByType<{className}>();");
+        sb.AppendLine($"{indent}                if (_instance == null)");
+        sb.AppendLine($"{indent}                {{");
+        sb.AppendLine($"{indent}                    var go = new GameObject(\"{className}\");");
+        sb.AppendLine($"{indent}                    _instance = go.AddComponent<{className}>();");
+        sb.AppendLine($"{indent}                }}");
+        sb.AppendLine($"{indent}            }}");
+        sb.AppendLine($"{indent}            return _instance;");
+        sb.AppendLine($"{indent}        }}");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}    private readonly Dictionary<Type, object> _instances = new();");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}    public static void Register<T>(T instance)");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        var type = typeof(T);");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}        if (Instance._instances.ContainsKey(type))");
+        sb.AppendLine($"{indent}        {{");
+        sb.AppendLine($"{indent}            Debug.LogWarning($\"{{type.Name}} already registered.\");");
+        sb.AppendLine($"{indent}            return");
+        sb.AppendLine($"{indent}        }}");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}        Instance._instances.Add(type, instance);");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}    public bool TryGet<T>(out T result)");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        if (_instances.TryGetValue(typeof(T), out var value))");
+        sb.AppendLine($"{indent}        {{");
+        sb.AppendLine($"{indent}            result = (T)value;");
+        sb.AppendLine($"{indent}            return true;");
+        sb.AppendLine($"{indent}        }}");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}        result = default;");
+        sb.AppendLine($"{indent}        return false;");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine("");
+        sb.AppendLine($"{indent}    private void Awake()");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        if (_instance == null)");
+        sb.AppendLine($"{indent}        {{");
+        sb.AppendLine($"{indent}            _instance = this;");
+        sb.AppendLine($"{indent}        }}");
+        sb.AppendLine($"{indent}        else if (_instance != this)");
+        sb.AppendLine($"{indent}        {{");
+        sb.AppendLine($"{indent}            Destroy(gameObject);");
+        sb.AppendLine($"{indent}        }}");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine($"{indent}}}");
 
         if (!string.IsNullOrEmpty(_sceneNamespace))
         {
@@ -718,7 +852,8 @@ public class CodeGenerator : EditorWindow
         Struct,
         Enum,
         Interface,
-        SceneBoot
+        SceneBoot,
+        Container
     }
 
     private enum AccessModifier

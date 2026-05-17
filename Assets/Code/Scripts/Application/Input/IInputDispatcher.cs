@@ -1,5 +1,4 @@
 using System;
-using UnityEngine.InputSystem;
 using UsefulTools.AutoGenerate;
 
 namespace UsefulTools.Infrastructure.Runtime.Input
@@ -36,8 +35,8 @@ namespace UsefulTools.Infrastructure.Runtime.Input
         /// <param name="actionName">ActionMap名 + Actions のEnumを利用する</param>
         /// <param name="action">登録／解除するメソッド</param>
         /// <param name="isRegister">trueなら登録、falseなら解除</param>
-        public void RegistrationStarted<TAction>(ActionMaps actionMap, TAction actionName,
-            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum;
+        public void RegistrationStarted<T, TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputContext<T>> action, bool isRegister) where TAction : Enum where T : unmanaged;
 
         /// <summary>
         /// Cancelledフェーズに対するActionの登録状態を変更する
@@ -46,8 +45,8 @@ namespace UsefulTools.Infrastructure.Runtime.Input
         /// <param name="actionName">ActionMap名 + Actions のEnumを利用する</param>
         /// <param name="action">登録／解除するメソッド</param>
         /// <param name="isRegister">trueなら登録、falseなら解除</param>
-        public void RegistrationCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum;
+        public void RegistrationCancelled<T, TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputContext<T>> action, bool isRegister) where TAction : Enum where T : unmanaged;
 
         /// <summary>
         /// StartedおよびCancelledフェーズに対するActionの登録状態を変更する
@@ -56,8 +55,8 @@ namespace UsefulTools.Infrastructure.Runtime.Input
         /// <param name="actionName">ActionMap名 + Actions のEnumを利用する</param>
         /// <param name="action">登録／解除するメソッド</param>
         /// <param name="isRegister">trueなら登録、falseなら解除</param>
-        public void RegistrationStartCancelled<TAction>(ActionMaps actionMap, TAction actionName,
-            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum;
+        public void RegistrationStartCancelled<T, TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputContext<T>> action, bool isRegister) where TAction : Enum where T : unmanaged;
 
         /// <summary>
         /// Performedフェーズに対するActionの登録状態を変更する
@@ -66,8 +65,8 @@ namespace UsefulTools.Infrastructure.Runtime.Input
         /// <param name="actionName">ActionMap名 + Actions のEnumを利用する</param>
         /// <param name="action">登録／解除するメソッド</param>
         /// <param name="isRegister">trueなら登録、falseなら解除</param>
-        public void RegistrationPerformed<TAction>(ActionMaps actionMap, TAction actionName,
-            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum;
+        public void RegistrationPerformed<T, TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputContext<T>> action, bool isRegister) where TAction : Enum where T : unmanaged;
 
         /// <summary>
         /// すべてのフェーズに対するActionの登録状態を変更する
@@ -76,8 +75,8 @@ namespace UsefulTools.Infrastructure.Runtime.Input
         /// <param name="actionName">ActionMap名 + Actions のEnumを利用する</param>
         /// <param name="action">登録／解除するメソッド</param>
         /// <param name="isRegister">trueなら登録、falseなら解除</param>
-        public void RegistrationAll<TAction>(ActionMaps actionMap, TAction actionName,
-            Action<InputAction.CallbackContext> action, bool isRegister) where TAction : Enum;
+        public void RegistrationAll<T, TAction>(ActionMaps actionMap, TAction actionName,
+            Action<InputContext<T>> action, bool isRegister) where TAction : Enum where T : unmanaged;
 
         /// <summary>
         /// 他のActionMapをすべて無効化し、一つのActionMapのみ有効化する

@@ -1337,6 +1337,67 @@ Transform:
   - {fileID: 1351602287}
   m_Father: {fileID: 1486465773}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1182935390
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1182935393}
+  - component: {fileID: 1182935392}
+  - component: {fileID: 1182935391}
+  m_Layer: 0
+  m_Name: VrSceneBoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1182935391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182935390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b2c38a0c085504083820ceb4e285fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Composition::UsefulTools.Composition.Runtime.Boot.VRTestSceneContainer
+  _vrPlayerMovementView: {fileID: 1486465776}
+--- !u!114 &1182935392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182935390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18dfe2ca831514479ed52d89e91c2b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Composition::UsefulTools.Composition.Runtime.Boot.VRTestSceneBoot
+  _container: {fileID: 1182935391}
+  _inputDispatcher: {fileID: 259568922}
+  vrPlayerMovementView: {fileID: 1486465776}
+--- !u!4 &1182935393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182935390}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.32103, y: -7.3807, z: -22.71057}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1351602286
 GameObject:
   m_ObjectHideFlags: 0
@@ -1468,7 +1529,6 @@ GameObject:
   - component: {fileID: 1486465776}
   - component: {fileID: 1486465775}
   - component: {fileID: 1486465774}
-  - component: {fileID: 1486465779}
   m_Layer: 0
   m_Name: XR Origin (VR)
   m_TagString: Untagged
@@ -1557,9 +1617,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: View::VrPlayerView
   InitializationOrder: 0
   _rigidbody: {fileID: 1486465775}
-  _xrOrigin: {fileID: 0}
-  _cameraOffset: {fileID: 0}
-  _mainCamera: {fileID: 0}
+  _xrOrigin: {fileID: 1486465773}
+  _cameraOffset: {fileID: 1154550000}
+  _mainCamera: {fileID: 2088003505}
 --- !u!114 &1486465777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1590,19 +1650,6 @@ MonoBehaviour:
   m_CameraFloorOffsetObject: {fileID: 1154549999}
   m_RequestedTrackingOriginMode: 2
   m_CameraYOffset: 0
---- !u!114 &1486465779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1486465772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bdf330f43b22b24c8e80fd4b3b0b8ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Infrastructure::UsefulVr.Infrastructure.Runtime.Player.VrPlayerMovementInfra
-  InitializationOrder: 0
 --- !u!1 &1505898304
 GameObject:
   m_ObjectHideFlags: 0
@@ -2076,3 +2123,4 @@ SceneRoots:
   - {fileID: 1650063711}
   - {fileID: 1811320118}
   - {fileID: 259568921}
+  - {fileID: 1182935393}

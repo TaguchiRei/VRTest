@@ -4,7 +4,7 @@ using UsefulVr.Presentation.Runtime.Player;
 
 namespace UsefulVr.View.Runtime.Player
 {
-    public class VrPlayerView : InitializableMonoBehaviour, IVrMovementView
+    public class VrPlayerMovementView : InitializableMonoBehaviour, IVrMovementView
     {
         [Header("Physics")] [SerializeField] private Rigidbody _rigidbody;
 
