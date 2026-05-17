@@ -12,6 +12,9 @@ public interface IVrPlayerPresenter
 
     float GravityPower { get; set; }
 
+    /// <summary> HMDのローカル座標 </summary>
+    Vector3 CameraLocalPosition { get; }
+
     void AddForce(Vector3 force, ForceMode mode);
 
     /// <summary> カメラの座標をプレイヤー座標に同期する </summary>

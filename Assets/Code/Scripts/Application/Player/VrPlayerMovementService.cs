@@ -70,7 +70,7 @@ namespace UsefulVr.Application.Runtime.Player
         public void Look(InputContext<Vector2> input)
         {
             if (!input.IsActive || Mathf.Abs(input.Value.x) < _entity.DeadZone) return;
-            
+
             float turnInput = input.Value.x;
             float turnAngle = turnInput * _entity.LookSpeed * Time.deltaTime;
 
@@ -91,12 +91,12 @@ namespace UsefulVr.Application.Runtime.Player
         {
             _vrPlayerPresenter.AddForce(_entity.Gravity.GravityForce, ForceMode.Acceleration);
         }
-
         /// <summary>
         /// HMD位置補正
         /// </summary>
-        public void ApplyCameraOffset(Vector3 cameraLocalPosition)
+        public void ApplyCameraOffset()
         {
+            Vector3 cameraLocalPosition = _vrPlayerPresenter.CameraLocalPosition;
             Vector3 offset = Vector3.ProjectOnPlane(cameraLocalPosition, _entity.Gravity.Direction.normalized);
 
             if (offset.sqrMagnitude < CAMERA_OFFSET_THRESHOLD * CAMERA_OFFSET_THRESHOLD)
@@ -106,6 +106,7 @@ namespace UsefulVr.Application.Runtime.Player
 
             _vrPlayerPresenter.SetOffset(offset);
         }
+
 
         /// <summary>
         /// 入力イベントの登録状態を変更する

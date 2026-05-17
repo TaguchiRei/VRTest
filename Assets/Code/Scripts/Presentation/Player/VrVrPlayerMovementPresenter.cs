@@ -29,6 +29,8 @@ namespace UsefulVr.Presentation.Runtime.Player
             set => _movementView.Rotation = value;
         }
 
+        public Vector3 CameraLocalPosition => _movementView.CameraLocalPosition;
+
         public void AddForce(Vector3 force, ForceMode mode)
         {
             _movementView.AddForce(force, mode);
