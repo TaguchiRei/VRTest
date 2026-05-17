@@ -29,7 +29,7 @@ namespace UsefulVr.Application.Runtime.Player
 
             _inputDispatcher.EnableActionMap(ActionMaps.VRControllers);
             _inputDispatcher.EnableInput();
-            
+
             Registration(true);
         }
 
@@ -41,23 +41,27 @@ namespace UsefulVr.Application.Runtime.Player
             if (!input.IsActive) return;
 
             Vector3 currentVelocity = _playerPresenter.Velocity;
-
             // 前回移動分除去
             Vector3 velocityWithoutLastMove =
                 MovementLogic.CalculateVelocityAfterStop(currentVelocity, _entity.LastMovePower.Value);
+            if (input.IsPerformed)
+            {
+                // 新規移動方向 
+                Vector3 moveVector = MovementLogic.CalculateMoveVector(
+                    input.Value, _entity.Gravity.Direction,
+                    _entity.LookDirection.Value);
+                moveVector *= _entity.MoveSpeed.Value;
 
-            // 新規移動方向 (EntityのLookDirectionを基準に計算されるため、上記のLookメソッドの回転が自動的に反映されます)
-            Vector3 moveVector =
-                MovementLogic.CalculateMoveVector(input.Value, _entity.Gravity.Direction, _entity.LookDirection.Value);
+                // Entity更新
+                _entity.UpdateMovePower(moveVector);
 
-            // Speed適用
-            moveVector *= _entity.MoveSpeed.Value;
-
-            // Entity更新
-            _entity.UpdateMovePower(moveVector);
-
-            // Velocity反映
-            _playerPresenter.Velocity = velocityWithoutLastMove + moveVector;
+                // Velocity反映
+                _playerPresenter.Velocity = velocityWithoutLastMove + moveVector;
+            }
+            else if (input.IsCanceled)
+            {
+                _playerPresenter.Velocity = velocityWithoutLastMove;
+            }
         }
 
         /// <summary>
@@ -65,21 +69,14 @@ namespace UsefulVr.Application.Runtime.Player
         /// </summary>
         public void Look(InputContext<Vector2> input)
         {
-            if (!input.IsActive || input.Value.x > _entity.DeadZone) return;
-
-            // スティックの左右入力を取得
+            if (!input.IsActive || Mathf.Abs(input.Value.x) < _entity.DeadZone) return;
+            
             float turnInput = input.Value.x;
-
-            // LookSpeed を適用して、1フレームあたりの回転角度を計算
             float turnAngle = turnInput * _entity.LookSpeed * Time.deltaTime;
 
             // 現在の重力の逆方向のベクトルを旋回軸とする
             Vector3 rotationAxis = -_entity.Gravity.Direction.normalized;
-
-            // 軸と角度から回転Quaternionを生成
             Quaternion deltaRotation = Quaternion.AngleAxis(turnAngle, rotationAxis);
-
-            // 物理的なプレイヤー本体の Rotation に回転を乗算して適用
             _playerPresenter.Rotation = deltaRotation * _playerPresenter.Rotation;
 
             // 本体が回転したため、Entityが保持しているLookDirectionも一緒に回転させて同期する

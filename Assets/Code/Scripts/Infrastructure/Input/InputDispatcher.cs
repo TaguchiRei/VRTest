@@ -16,6 +16,11 @@ namespace UsefulTools.Infrastructure.Runtime.Input
         private readonly Dictionary<Delegate, Action<InputAction.CallbackContext>>
             _registeredInputActions = new();
 
+        /// <summary>
+        /// Polling入力用の前フレーム状態保持
+        /// </summary>
+        private readonly Dictionary<InputAction, bool> _previousInputStates = new();
+
         public override void Initialize()
         {
             base.Initialize();
@@ -46,6 +51,7 @@ namespace UsefulTools.Infrastructure.Runtime.Input
             }
 
             _registeredInputActions.Clear();
+            _previousInputStates.Clear();
 
             _actionAsset.Disable();
         }
@@ -81,6 +87,18 @@ namespace UsefulTools.Infrastructure.Runtime.Input
             where T : unmanaged
             where TAction : Enum
         {
+            var inputAction = GetAction(
+                actionMap.ToString(),
+                actionName.ToString());
+
+            if (inputAction == null)
+            {
+                Debug.LogWarning(
+                    $"[InputDispatcher] {actionMap}.{actionName} は見つかりませんでした。");
+
+                return;
+            }
+
             if (isRegister)
             {
                 if (_registeredReadActions.ContainsKey(action))
@@ -88,10 +106,39 @@ namespace UsefulTools.Infrastructure.Runtime.Input
 
                 void UpdateAction()
                 {
+                    T value = inputAction.ReadValue<T>();
+
+                    bool currentActive =
+                        !EqualityComparer<T>.Default.Equals(value, default);
+
+                    bool previousActive =
+                        _previousInputStates.GetValueOrDefault(inputAction);
+
+                    InputActionPhase phase;
+
+                    if (!previousActive && currentActive)
+                    {
+                        phase = InputActionPhase.Started;
+                    }
+                    else if (previousActive && currentActive)
+                    {
+                        phase = InputActionPhase.Performed;
+                    }
+                    else if (previousActive && !currentActive)
+                    {
+                        phase = InputActionPhase.Canceled;
+                    }
+                    else
+                    {
+                        phase = InputActionPhase.Waiting;
+                    }
+
+                    _previousInputStates[inputAction] = currentActive;
+
                     action?.Invoke(
-                        ReadValue<T, TAction>(
-                            actionMap,
-                            actionName));
+                        new InputContext<T>(
+                            phase,
+                            value));
                 }
 
                 _registeredReadActions.Add(action, UpdateAction);

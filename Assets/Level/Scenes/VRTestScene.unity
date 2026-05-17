@@ -308,6 +308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Composition::InputInitializer
   InitializationOrder: 0
+  _inputDispatcher: {fileID: 259568922}
 --- !u!4 &259568921
 Transform:
   m_ObjectHideFlags: 0
@@ -1410,8 +1411,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Composition::VRTest.Composition.Runtime.Boot.VRTestSceneBoot
   _container: {fileID: 1182935394}
-  _playerInitializer: {fileID: 1486465779}
   _inputInitializer: {fileID: 259568919}
+  _playerInitializer: {fileID: 1486465779}
 --- !u!1 &1351602286
 GameObject:
   m_ObjectHideFlags: 0
@@ -1681,7 +1682,7 @@ MonoBehaviour:
   _vrPlayerMovementView: {fileID: 1486465776}
   _gravityVector: {x: 0, y: -1, z: 0}
   _gravityPower: 9.81
-  _moveSpeed: 10
+  _moveSpeed: 2
   _rotateSpeed: 10
   _deadZone: 0.25
 --- !u!1 &1505898304
