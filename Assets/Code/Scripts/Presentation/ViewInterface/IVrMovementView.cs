@@ -5,6 +5,7 @@ namespace UsefulVr.Presentation.Runtime.Player
     public interface IVrMovementView
     {
         Vector3 Velocity { get; set; }
+        Quaternion Rotation { get; set; }
 
         Vector3 ColliderPosition { get; }
 

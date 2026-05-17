@@ -22,6 +22,12 @@ namespace UsefulVr.View.Runtime.Player
             set => _rigidbody.linearVelocity = value;
         }
 
+        public Quaternion Rotation
+        {
+            get => transform.localRotation;
+            set => transform.localRotation = value;
+        }
+
         /// <summary>
         /// PlayerRootのワールド座標
         /// </summary>
@@ -42,6 +48,7 @@ namespace UsefulVr.View.Runtime.Player
             base.Initialize();
 
             _rigidbody.useGravity = false;
+            gameObject.SetActive(true);
         }
 
         public void AddForce(Vector3 force, ForceMode mode)

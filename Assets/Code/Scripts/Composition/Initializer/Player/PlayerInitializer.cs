@@ -11,10 +11,12 @@ namespace UsefulVr.Composition.Runtime.Player
 {
     public class PlayerInitializer : InitializerBase, IInjectable<IInputDispatcher>
     {
-        [SerializeField] private VrPlayerMovementView _playerMovementView;
+        [SerializeField] private VrPlayerMovementView _vrPlayerMovementView;
         [SerializeField] private Vector3 _gravityVector;
         [SerializeField] private float _gravityPower;
         [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _rotateSpeed;
+        [SerializeField] private float _deadZone;
         private VrPlayerMovementService _playerMovementService;
         private VrPlayerMovementPresenter _vrPlayerPresenter;
         private VrPlayerMovementEntity _vrPlayerMovementEntity;
@@ -25,9 +27,14 @@ namespace UsefulVr.Composition.Runtime.Player
         public override void Initialize()
         {
             base.Initialize();
-            _vrPlayerPresenter = new(_playerMovementView);
-            _vrPlayerMovementEntity = new(new(_gravityVector, _gravityPower), new(_moveSpeed));
+            _vrPlayerPresenter = new(_vrPlayerMovementView);
+            _vrPlayerMovementEntity = new(
+                new(_gravityVector, _gravityPower),
+                new(_moveSpeed),
+                _rotateSpeed, _deadZone);
             _playerMovementService = new(_vrPlayerPresenter, _vrPlayerMovementEntity, _inputDispatcher);
+
+            _vrPlayerMovementView.Initialize();
         }
 
         public void Inject(IInputDispatcher obj)

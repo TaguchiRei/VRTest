@@ -307,7 +307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90232efb168208e4db4ca011ea71b1cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Composition::InputInitializer
-  InputDispatcher: {fileID: 259568922}
+  InitializationOrder: 0
 --- !u!4 &259568921
 Transform:
   m_ObjectHideFlags: 0
@@ -723,6 +723,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 918255195}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 918255198}
   m_SourcePrefab: {fileID: 100100000, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
 --- !u!4 &918255139 stripped
 Transform:
@@ -1093,6 +1096,20 @@ MonoBehaviour:
   - {fileID: 918255166}
   - {fileID: 918255172}
   - {fileID: 918255173}
+--- !u!114 &918255198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918255194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36dd4f045bc6319428ad385945ea1c44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: View::UsefulTools.View.Runtime.ModelTargetTracker
+  _target: {fileID: 2088003505}
+  _offset: {x: 0, y: 1.32, z: 0.092}
 --- !u!1 &933393299
 GameObject:
   m_ObjectHideFlags: 0
@@ -1122,8 +1139,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8673a7e943a13cc4aac1ce80618bc120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Composition::IngameComposition
-  _inputInitializer: {fileID: 259568919}
-  _playerInitializer: {fileID: 0}
 --- !u!4 &933393301
 Transform:
   m_ObjectHideFlags: 0
@@ -1346,8 +1361,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1182935393}
-  - component: {fileID: 1182935392}
-  - component: {fileID: 1182935391}
+  - component: {fileID: 1182935395}
+  - component: {fileID: 1182935394}
   m_Layer: 0
   m_Name: VrSceneBoot
   m_TagString: Untagged
@@ -1355,34 +1370,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1182935391
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1182935390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35b2c38a0c085504083820ceb4e285fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Composition::UsefulTools.Composition.Runtime.Boot.VRTestSceneContainer
-  _vrPlayerMovementView: {fileID: 1486465776}
---- !u!114 &1182935392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1182935390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18dfe2ca831514479ed52d89e91c2b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Composition::UsefulTools.Composition.Runtime.Boot.VRTestSceneBoot
-  _container: {fileID: 1182935391}
-  _inputDispatcher: {fileID: 259568922}
-  vrPlayerMovementView: {fileID: 1486465776}
 --- !u!4 &1182935393
 Transform:
   m_ObjectHideFlags: 0
@@ -1398,6 +1385,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1182935394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182935390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b2c38a0c085504083820ceb4e285fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Composition::VRTest.Composition.Runtime.Boot.VRTestSceneContainer
+--- !u!114 &1182935395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182935390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18dfe2ca831514479ed52d89e91c2b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Composition::VRTest.Composition.Runtime.Boot.VRTestSceneBoot
+  _container: {fileID: 1182935394}
+  _playerInitializer: {fileID: 1486465779}
+  _inputInitializer: {fileID: 259568919}
 --- !u!1 &1351602286
 GameObject:
   m_ObjectHideFlags: 0
@@ -1529,6 +1543,7 @@ GameObject:
   - component: {fileID: 1486465776}
   - component: {fileID: 1486465775}
   - component: {fileID: 1486465774}
+  - component: {fileID: 1486465779}
   m_Layer: 0
   m_Name: XR Origin (VR)
   m_TagString: Untagged
@@ -1615,7 +1630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7bfb3fd13fe24e4ca89a618167b61fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: View::VrPlayerView
-  InitializationOrder: 0
+  InitializationOrder: 1
   _rigidbody: {fileID: 1486465775}
   _xrOrigin: {fileID: 1486465773}
   _cameraOffset: {fileID: 1154550000}
@@ -1650,6 +1665,25 @@ MonoBehaviour:
   m_CameraFloorOffsetObject: {fileID: 1154549999}
   m_RequestedTrackingOriginMode: 2
   m_CameraYOffset: 0
+--- !u!114 &1486465779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486465772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd0d6256d84c1f74fa3d96cdd78d5f19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Composition::UsefulVr.Composition.Runtime.Player.PlayerInitializer
+  InitializationOrder: 0
+  _vrPlayerMovementView: {fileID: 1486465776}
+  _gravityVector: {x: 0, y: -1, z: 0}
+  _gravityPower: 9.81
+  _moveSpeed: 10
+  _rotateSpeed: 10
+  _deadZone: 0.25
 --- !u!1 &1505898304
 GameObject:
   m_ObjectHideFlags: 0

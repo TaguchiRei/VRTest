@@ -5,6 +5,8 @@ namespace UsefulTools.AutoGenerate
     public enum ActionMaps
     {
         Player,
-        UI
+        UI,
+        VRTransform,
+        VRControllers
     }
 }

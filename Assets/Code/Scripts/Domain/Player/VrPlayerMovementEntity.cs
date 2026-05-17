@@ -13,14 +13,23 @@ namespace UsefulVr.Domain.Runtime.Player
         public LookDirectionValue LookDirection { get; private set; }
         public MoveSpeed MoveSpeed { get; private set; }
 
+        public float LookSpeed { get; private set; }
+
+        public float DeadZone { get; private set; }
+
         public VrPlayerMovementEntity(
             GravityValue gravity,
-            MoveSpeed moveSpeed)
+            MoveSpeed moveSpeed,
+            float lookSpeed,
+            float deadZone)
         {
             Gravity = gravity;
             MoveSpeed = moveSpeed;
 
             LastMovePower = MovePowerValue.Zero;
+
+            LookSpeed = lookSpeed;
+            DeadZone = deadZone;
 
             // 初期値としてのみ使用
             LookDirection = new LookDirectionValue(Vector3.forward);

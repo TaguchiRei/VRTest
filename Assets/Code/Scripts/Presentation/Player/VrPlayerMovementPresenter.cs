@@ -23,6 +23,12 @@ namespace UsefulVr.Presentation.Runtime.Player
             set => _movementView.Velocity = value;
         }
 
+        public Quaternion Rotation
+        {
+            get => _movementView.Rotation;
+            set => _movementView.Rotation = value;
+        }
+
         public void AddForce(Vector3 force, ForceMode mode)
         {
             _movementView.AddForce(force, mode);

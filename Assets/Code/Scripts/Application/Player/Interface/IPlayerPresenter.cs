@@ -5,6 +5,9 @@ public interface IPlayerPresenter
     /// <summary> Rigidbody.linerVelocity </summary>
     Vector3 Velocity { get; set; }
 
+    /// <summary> Transform.rotation </summary>
+    Quaternion Rotation { get; set; }
+
     Vector3 GravityVector { get; set; }
 
     float GravityPower { get; set; }

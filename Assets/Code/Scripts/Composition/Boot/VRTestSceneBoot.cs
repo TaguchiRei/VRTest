@@ -1,16 +1,16 @@
 using UnityEngine;
+using UsefulTools.Composition.Runtime.Input;
 using UsefulTools.Infrastructure.Runtime.Input;
-using UsefulTools.UtilityUnity.Runtime.UtilityUnity;
-using UsefulVr.View.Runtime.Player;
+using UsefulVr.Composition.Runtime.Player;
 
-namespace UsefulTools.Composition.Runtime.Boot
+namespace VRTest.Composition.Runtime.Boot
 {
     public class VRTestSceneBoot : MonoBehaviour
     {
         [SerializeField] private VRTestSceneContainer _container;
 
-        [SerializeField] private VrPlayerMovementView _vrPlayerMovementView;
-        [SerializeField] private InputDispatcher _inputDispatcher;
+        [SerializeField] private InputInitializer _inputInitializer;
+        [SerializeField] private PlayerInitializer _playerInitializer;
 
         private void Start()
         {
@@ -20,12 +20,16 @@ namespace UsefulTools.Composition.Runtime.Boot
 
         private void Inject()
         {
+            if (_playerInitializer != null && _container.TryGet<IInputDispatcher>(out var arg_playerInitializer_0))
+            {
+                _playerInitializer.Inject(arg_playerInitializer_0);
+            }
         }
 
         private void Initialize()
         {
-            if (_vrPlayerMovementView != null) _vrPlayerMovementView.Initialize();
-            if (_inputDispatcher != null) _inputDispatcher.Initialize();
+            if (_inputInitializer != null) _inputInitializer.Initialize();
+            if (_playerInitializer != null) _playerInitializer.Initialize();
         }
     }
 }

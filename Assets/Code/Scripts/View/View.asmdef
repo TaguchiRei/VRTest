@@ -4,7 +4,8 @@
     "references": [
         "Presentation",
         "UtilityUnity",
-        "Utility"
+        "Utility",
+        "UsefulAttributes"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
