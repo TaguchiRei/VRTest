@@ -5,7 +5,7 @@ using UsefulAttribute;
 namespace UsefulTools.UtilityUnity.Runtime.UtilityUnity
 {
     [DefaultExecutionOrder(100)]
-    public abstract class InitializableMonoBehaviour : MonoBehaviour, IComparable<InitializerBase>
+    public abstract class InitializableMonoBehaviour : MonoBehaviour, IComparable<InitializableMonoBehaviour>
     {
         public int InitializationOrder = 0;
         [ShowOnly] public bool Initialized { get; protected set; } = false;
@@ -23,7 +23,7 @@ namespace UsefulTools.UtilityUnity.Runtime.UtilityUnity
             enabled = true;
         }
 
-        public int CompareTo(InitializerBase other)
+        public int CompareTo(InitializableMonoBehaviour other)
         {
             return InitializationOrder.CompareTo(other.InitializationOrder);
         }

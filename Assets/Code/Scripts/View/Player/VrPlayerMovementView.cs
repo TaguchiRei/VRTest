@@ -48,7 +48,8 @@ namespace UsefulVr.View.Runtime.Player
             base.Initialize();
 
             _rigidbody.useGravity = false;
-            gameObject.SetActive(true);
+            enabled = true;
+            Debug.Log("Initialized VrPlayerMovementView");
         }
 
         public void AddForce(Vector3 force, ForceMode mode)
